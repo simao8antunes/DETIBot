@@ -4,56 +4,90 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DetiBot</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.0/main.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.0/main.min.css" rel="stylesheet"/>
 </head>
 <body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Navbar</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Pricing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-<div class="container py-5">
-  <h1 class="text-center mb-5">Project Stages</h1>
+  <div class="container py-5">
+    <h1 class="text-center mb-5">Project Stages</h1>
 
-  <!-- Calendar -->
-  <div id="calendar"></div>
-  
-  <div class="card mb-3">
-    <div class="card-body">
-      <h2 class="card-title">Stage 1: Planning</h2>
-      <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eget arcu sit amet est imperdiet pulvinar. Nulla facilisi.</p>
-    </div>
-  </div>
-  
-  <div class="card mb-3">
-    <div class="card-body">
-      <h2 class="card-title">Stage 2: Development</h2>
-      <p class="card-text">Integer cursus, tellus nec ullamcorper tincidunt, enim ipsum fermentum arcu, a rutrum felis libero eget mauris.</p>
-    </div>
-  </div>
-  
-  <div class="card mb-3">
-    <div class="card-body">
-      <h2 class="card-title">Stage 3: Testing</h2>
-      <p class="card-text">Vivamus semper quam nec libero pulvinar, in mollis nulla ullamcorper. Nullam euismod felis sit amet velit bibendum pellentesque.</p>
-    </div>
-  </div>
-  
-  <div class="card mb-3">
-    <div class="card-body">
-      <h2 class="card-title">Stage 4: Deployment</h2>
-      <p class="card-text">Duis porta luctus ex id tempus. Nulla facilisi. Duis congue elit vitae dapibus malesuada.</p>
-    </div>
-  </div>
-</div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="card-title">Milestone 1: Planning</h2>
+            <p class="card-text">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eget
+              arcu sit amet est imperdiet pulvinar. Nulla facilisi.
+            </p>
+          </div>
+        </div>
+      </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.0/main.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth'
-      // Add more options as needed
-    });
-    calendar.render();
-  });
-</script>
+      <div class="col-md-6 mb-3">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="card-title">Milestone 2: Architecture</h2>
+            <p class="card-text">
+              Integer cursus, tellus nec ullamcorper tincidunt, enim ipsum
+              fermentum arcu, a rutrum felis libero eget mauris.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="card-title">Milestone 3: Prototype</h2>
+            <p class="card-text">
+              Vivamus semper quam nec libero pulvinar, in mollis nulla
+              ullamcorper. Nullam euismod felis sit amet velit bibendum
+              pellentesque.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="card-title">Milestone 4: Final Product</h2>
+            <p class="card-text">
+              Duis porta luctus ex id tempus. Nulla facilisi. Duis congue elit
+              vitae dapibus malesuada.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.0/main.min.js"></script>
 </body>
 </html>
