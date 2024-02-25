@@ -1,2 +1,2 @@
 # detiBot
-[Development page](https://detibot.pages.dev)
+[Website](https://detibot.pages.dev)
