@@ -28,6 +28,9 @@
       import fontAwesome from "https://cdn.skypack.dev/font-awesome@4.7.0";
     </script>
     -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js"></script>
+    -->
 
 </head>
 <body id="page-top">
@@ -43,10 +46,10 @@
             <a class="nav-link active" aria-current="page" href="index.html">Milestones</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="embeded.html">Product Page</a>
+            <a class="nav-link" href="embeded.html">Product</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="chat">Chat Page</a>
+            <a class="nav-link" href="chat">Chat</a>
           </li>
         </ul>
       </div>
@@ -145,7 +148,7 @@
   </div>
 
 
-  <div  class="container py-5">   
+  <div  class="container">   
     <div class="row">
       <div class="card border-left-dark shadow h-100">
         <a class="nav-link" href="#links">
@@ -158,8 +161,9 @@
                       <a href="https://github.com/Gu1lhermeLopes/detiBot">Development Repository</a>
                       <br>
                       <a href="files/DETIBOT-1.pdf">Milestone 1 Presentation</a>
+                      <br>
+                      <a href="files/Milestone2.pdf">Milestone 2 Presentation</a>
                     </div>
-
                   </div>
               </div>
           </div>
@@ -622,8 +626,154 @@
               </div>
             </div>
         </div>
+        <!-- ------------------------------------------ End SWOT ------------------------------------------ -->
 
-          <!-- ------------------------------------------ End SWOT ------------------------------------------ -->
+        <!-- ------------------------------------------ Gantt ------------------------------------------ -->
+
+        <div class="py-5" id="gantt">
+          <div class="container">
+              <div class="row">
+                  <div class="col-md-12 text-center">
+                      <div class="lc-block">
+                          <h5 editable="inline" class="display-6 mb-0">Project Calendar</h5>
+                      </div><!-- /lc-block -->
+                  </div>
+              </div>
+              <div class="chartCard">
+                <div class="chartBox">
+                  <canvas id="myChart"></canvas>
+                </div>
+              </div>
+              <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+              <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js" integrity="sha512-JPcRR8yFa8mmCsfrw4TNte1ZvF1e3+1SdGMslZvmrzDYxS69J7J49vkFL8u6u8PlPJK+H3voElBtUCzaXj+6ig==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+            <script>
+            // setup 
+            const data = {
+              labels: ['Understand the scope of the project', 
+              'Define goals and Objectives', 
+              'M1: Milestone 1', 
+              'Make a prototype', 
+              'Define architecture and tecnologies', 
+              'M2: Milestone 2', 
+              'Choose knowledge sources',
+              'Discord server bot', 
+              'Develop RAG',
+              'Implement the LLM',
+              'Develop the api',
+              'Develop the Frontend(s)',
+              'Unit Tests and Integration Tests',
+              'Check Point',
+              'M3: Milestone 3',
+              'Usability tests',
+              'Check Point',
+              'Check Point',
+              'Create Demo and Poster for Students@Deti',
+              'Submit technical report',
+              'M4: Milestone 4',
+            ],
+              datasets: [{
+                label: 'Gantt Timeline',
+                data: [
+
+                ['2024-02-20', '2024-02-27'],
+                ['2024-02-20', '2024-02-27'],
+                ['2024-02-27', '2024-02-28'],
+                ['2024-02-27', '2024-03-12'],
+                ['2024-02-27', '2024-03-12'],
+                ['2024-03-12', '2024-03-13'],
+                ['2024-03-12', '2024-03-19'],
+                ['2024-03-12', '2024-04-02'],
+                ['2024-03-12', '2024-04-16'],
+                ['2024-03-12', '2024-04-16'],
+                ['2024-03-12', '2024-04-16'],
+                ['2024-03-12', '2024-05-21'],
+                ['2024-03-12', '2024-05-21'],
+                ['2024-04-02', '2024-04-03'],
+                ['2024-04-16', '2024-04-17'],
+                ['2024-04-23', '2024-05-21'],
+                ['2024-05-07', '2024-05-08'],
+                ['2024-05-21', '2024-05-22'],
+                ['2024-05-21', '2024-05-28'],
+                ['2024-05-30', '2024-06-06'],
+                ['2024-04-06', '2024-04-07']
+
+                ],
+                backgroundColor: [
+                'rgba(255, 26, 104, 1)',    // Red
+                  'rgba(54, 162, 235, 1)',  // Blue
+                  'rgba(255, 206, 86, 1)',  // Yellow
+                  'rgba(75, 192, 192, 1)',  // Green
+                  'rgba(153, 102, 255, 1)', // Purple
+                  'rgba(255, 159, 64, 1)',  // Orange
+                  'rgba(0, 0, 0, 1)'        // Black
+                ],
+                borderColor: [
+                  'rgba(255, 26, 104, 1)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)',
+                  'rgba(255, 159, 64, 1)',
+                  'rgba(0, 0, 0, 1)'
+                ],
+                barPercentage: 0.2,
+              }]
+            };
+
+            // config 
+            const config = {
+              type: 'bar',
+              data,
+              options: {
+                plugins: {
+                  
+                  tooltip: {
+                    enabled: false,
+                    callbacks: {
+                      label: function(context) {
+                        label = ChartDataLabels.formatters.title(context);
+                        return label;
+                      }
+                    }
+                  },
+
+                },
+                indexAxis: 'y',
+                scales: {
+                  x: {
+                    min: '2024-02-20',
+                    type: 'time',
+                    time: {
+                      unit: 'day'
+                    }
+                  },
+                  y: {
+                    beginAtZero: true
+                  }
+                }
+              },
+              //plugins: [ChartDataLabels],
+            };
+
+            // render init block
+            const myChart = new Chart(
+              document.getElementById('myChart'),
+              config
+            );
+
+            // Instantly assign Chart.js version
+            const chartVersion = document.getElementById('chartVersion');
+            chartVersion.innerText = Chart.version;
+            </script>
+          </div>
+        </div>
+
+
+
+
+        <!-- ------------------------------------------ End Gantt ------------------------------------------ -->
 
 
           </div>
@@ -689,20 +839,13 @@
   <!-- ------------------------------------------ End Milestone 4 ------------------------------------------ -->
 
   
-
   <footer class="bg-body-tertiary text-center">
-
       <div  style="background-color: rgba(0, 0, 0, 0.05);">
          <a class="nav-link" href="#top"><i class="fas fa-angle-up fa-2x text-dark-300"></i></a>
       </div>
-
-
-        
-        
   </footer>
 
 
-  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.0/main.min.js"></script>
   <!--  <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js'></script>  -->
   <script type="module" src="./script.js"></script>
