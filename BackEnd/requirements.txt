@@ -1,0 +1,10 @@
+#dps ver se vale ou não apena criar requeriments diferentes para o controller e o autoupdate
+
+fastapi
+uvicorn
+llama-index
+pydantic
+mysql-connector-python
+llama-index-embeddings-huggingface
+llama-index-embeddings-instructor
+llama-index-vector-stores-qdrant
