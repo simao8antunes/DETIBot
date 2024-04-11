@@ -8,3 +8,7 @@ mysql-connector-python
 llama-index-embeddings-huggingface
 llama-index-embeddings-instructor
 llama-index-vector-stores-qdrant
+langchain_community==0.0.32
+langchain_text_splitters==0.0.1
+pypdf==4.2.0
+qdrant-client==1.8.2

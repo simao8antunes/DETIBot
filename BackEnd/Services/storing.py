@@ -5,9 +5,14 @@
 from Services.classes import Source
 from datetime import datetime, timedelta
 import mysql.connector
+from qdrant_client import QdrantClient
 
 class Qdrantdb:
-    pass
+    
+    def __init__(self):
+        self.client = QdrantClient(
+            url="http://localhost:6333"
+        )
 
 class H2:
     
