@@ -40,9 +40,9 @@ services:
     environment:
     - PYTHONDONTWRITEBYTECODE 1
     - PYTHONUNBUFFERED 1
-
     depends_on:
       - qdrant
+      - mysql
     #  rabbitmq:
     #    condition: service_healthy
     #links:
@@ -55,6 +55,9 @@ services:
     image: update
     container_name: update
     restart: on-failure
+    depends_on:
+      - qdrant
+      - mysql
 
     #depends_on:
     #  rabbitmq:
