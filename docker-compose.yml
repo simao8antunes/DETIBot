@@ -8,8 +8,6 @@ services:
     restart: unless-stopped
     ports:
       - 6333:6333
-    #volumes:
-     # - .:/qdrant/storage
 
   mysql:
     image: mysql:latest
@@ -43,7 +41,8 @@ services:
     - PYTHONDONTWRITEBYTECODE 1
     - PYTHONUNBUFFERED 1
 
-    #depends_on:
+    depends_on:
+      - qdrant
     #  rabbitmq:
     #    condition: service_healthy
     #links:
