@@ -30,7 +30,7 @@ class Indexing:
         
 
 
-    def indexer(self,doc):
+    def indexer(self,doc=None):
         """#embendings = self.embeded_model.get_text_embedding(doc)
         index = VectorStoreIndex.from_documents(
             show_progress=True,

@@ -5,7 +5,7 @@ import logging
 db = H2()
 load = Loading()
 
-logging.basicConfig(filename="update.log", level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 logging.debug("Automated updater initialized, %s",datetime.now())
 #updates the timestamps that are saved
 logging.debug("Refresh the date of the update_time table where id=1, result: %s; %s",db.update_time(1),datetime.now())
