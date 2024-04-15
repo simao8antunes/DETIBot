@@ -10,9 +10,11 @@ from qdrant_client import QdrantClient
 class Qdrantdb:
     
     def __init__(self):
-        self.client = QdrantClient(
-            url="http://localhost:6333"
-        )
+        
+        
+       pass
+
+        
 
 class H2:
     
@@ -21,7 +23,7 @@ class H2:
         # Connect to MySQL
         try:
             self.conn = mysql.connector.connect(
-                host="localhost",
+                host="mysqldb", #host="mysqldb" <-docker || local -> host="localhost"
                 user="bot",
                 password="pi2024",
                 database="Detibot"
