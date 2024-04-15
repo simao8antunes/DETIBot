@@ -14,7 +14,7 @@ async def root():
 
 @app.get("/detibot/{prompt}")
 async def Question(prompt: str):
-   return query.answer_question(prompt)
+   return query.queries(prompt)
     
 
 @app.post("/detibot/insert_source")
@@ -22,4 +22,4 @@ async def KnowledgeSource(source: Source):
     #inserts the source object into the db
     db.insert_source(source)
     #loads the new source object
-    load.loader(source.url,source.loader_type)
+    load.loader()

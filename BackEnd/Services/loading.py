@@ -4,27 +4,21 @@
 #from llama_index.core import SimpleDirectoryReader
 
 from Services.indexing import Indexing
-#
-#from langchain_text_splitters import RecursiveCharacterTextSplitter
-#from langchain_community.document_loaders.pdf import PyPDFLoader
+from langchain_community.vectorstores.qdrant import Qdrant
+from langchain_community.embeddings.huggingface import HuggingFaceInferenceAPIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders.pdf import PyPDFLoader
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+import os
+from Services.rag import Rag
 
-index = Indexing()
+indexer = Indexing()
+PDF_PATH = "./Data/info.pdf"
 
+rag = Rag(PDF_PATH)
 class Loading:
-
-    def loader(self,url=None, loader_type=None):
-        
-        #data = PyPDFLoader("./Data/info.pdf")
-#
-        #documents = data.load()
-#
-        #text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=50)
-#
-        #chunks = text_splitter.split_documents(documents)
-
-        #documents = SimpleDirectoryReader("./Data").load_data()
-#
-        #print("loaded document: %s",documents)
-        #
-        index.indexer()
+    def loader(self):
+        documents = rag.load_documents()
+        print(documents)
+        indexer.index(documents)
         return {"Loading": "Successfull"}
