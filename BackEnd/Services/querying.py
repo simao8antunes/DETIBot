@@ -15,5 +15,5 @@ from Services.rag import Rag
 rag = Rag()
 class Query: 
         def queries(self, question):
-            rag.query(question)
-            return {"Indexing": "Successfull"}
+            response = rag.query(question)
+            return {"query": response}

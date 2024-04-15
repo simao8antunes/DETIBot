@@ -5,6 +5,7 @@ from langchain_community.embeddings.huggingface import HuggingFaceInferenceAPIEm
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders.pdf import PyPDFLoader
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from qdrant_client import QdrantClient, models
 
 class Rag:
     def __init__(self, path=None):
@@ -15,29 +16,26 @@ class Rag:
             api_key=self.token,
             model_name="BAAI/bge-base-en-v1.5"
         )
-        self.vector_store = None
+
 
     def load_documents(self):
         data = PyPDFLoader(self.path)
         return data.load()
 
     def index_documents(self, documents):
+        
         chunks = self.text_splitter.split_documents(documents)
-        self.vector_store = Qdrant.from_documents(
+        index = Qdrant.from_documents(
             chunks,
-            self.embeddings,
+            embedding=self.embeddings,
             url="http://localhost:6333",
             collection_name="db"
         )
 
 
     def query(self, question):
-
-        self.vector_store = Qdrant(
-            url="http://localhost:6333",
-            collection_name="db"
-        )
-
+        client = QdrantClient(url="http://localhost:6333")
+        self.vector_store = Qdrant(client=client,embeddings=self.embeddings,collection_name="db")
         search = self.vector_store.similarity_search(question)
         if search:
             most_similar_chunk = search[0]

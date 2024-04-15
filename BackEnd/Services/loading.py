@@ -13,7 +13,7 @@ import os
 from Services.rag import Rag
 
 indexer = Indexing()
-PDF_PATH = "./Data/info.pdf"
+PDF_PATH = "./Data/calend.pdf"
 
 rag = Rag(PDF_PATH)
 class Loading:
