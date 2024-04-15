@@ -9,41 +9,42 @@
 #
 #TOKEN = "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"
 #os.environ["TOKEN"] = "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"
-from llama_index.core import VectorStoreIndex
+#from llama_index.core import VectorStoreIndex
 #from Services.storing import Qdrantdb
 from qdrant_client import QdrantClient,models
-from llama_index.core import StorageContext
-from llama_index.vector_stores.qdrant import QdrantVectorStore
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from llama_index.core import Settings
+#from llama_index.core import StorageContext
+#from llama_index.vector_stores.qdrant import QdrantVectorStore
+#from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+#from llama_index.llms.huggingface import HuggingFaceInferenceAPI
+#from llama_index.core import Settings
 #from llama_index.llms.openllm import OpenLLMAPI
 class Query: 
 
     def __init__(self):
-        self.client = QdrantClient(url="http://localhost:6333")# (host="qdrantdb",port=6333) <-docker || local -> url="http://localhost:6333"
+        self.client = QdrantClient(host="qdrantdb",port=6333)# (host="qdrantdb",port=6333) <-docker || local -> url="http://localhost:6333"
         if not self.client.collection_exists(collection_name="detibot"):
             self.client.create_collection(
                 collection_name="detibot",
-                vectors_config=models.VectorParams(size=100, distance=models.Distance.COSINE),
+                vectors_config=models.VectorParams(size=384, distance=models.Distance.COSINE),
             )
-        if not self.client.collection_exists(collection_name="detibot"):
+        """if not self.client.collection_exists(collection_name="detibot"):
             self.client.create_collection(collection_name="detibot")
         self.vector_store = QdrantVectorStore(client=self.client, collection_name="detibot")
         self.storage_context = StorageContext.from_defaults(vector_store=self.vector_store)
         #self.local_llm = OpenLLMAPI(address="http://localhost:3000") #"HuggingFaceH4/zephyr-7b-alpha"
         self.embeded_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
         Settings.embed_model = self.embeded_model
-        #Settings.llm = self.local_llm
+        #Settings.llm = HuggingFaceInferenceAPI(model_name="HuggingFaceH4/zephyr-7b-alpha", token="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")"""
 
     def answer_question(self,prompt:str):
 
-        index = VectorStoreIndex.from_vector_store(
-            vector_store=self.vector_store,
-        )
+        #index = VectorStoreIndex.from_vector_store(
+        #    vector_store=self.vector_store,
+        #)
+#
+        #query_engine = index.as_query_engine()
 
-        query_engine = index.as_query_engine()
-
-        return {"resposta":query_engine.query(prompt)}
+        return {"resposta":prompt}
 
 #
         #if search:
