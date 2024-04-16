@@ -23,7 +23,7 @@ class H2:
         # Connect to MySQL
         try:
             self.conn = mysql.connector.connect(
-                host="localhost", #host="mysqldb" <-docker || local -> host="localhost"
+                host="mysqldb", #host="mysqldb" <-docker || local -> host="localhost"
                 user="bot",
                 password="pi2024",
                 database="Detibot"

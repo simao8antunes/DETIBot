@@ -7,3 +7,4 @@ mysql-connector-python
 qdrant_client
 langchain_community
 langchain_text_splitters
+transformers
