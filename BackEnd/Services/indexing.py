@@ -9,4 +9,3 @@ class Indexing:
         def index(self, documents):
             rag.index_documents(documents)
             return {"Indexing": "Successfull"}
-    
