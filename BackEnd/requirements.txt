@@ -2,11 +2,9 @@
 
 fastapi
 uvicorn
-#llama-index-core
 pydantic
 mysql-connector-python
 qdrant_client
-#llama-index-embeddings-huggingface
-#llama-index-vector-stores-qdrant
-#llama-index-llms-huggingface
-#llama-index-llms-openllm
+langchain_community
+langchain_text_splitters
+transformers
