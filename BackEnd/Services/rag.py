@@ -37,6 +37,7 @@ class Rag:
         client = QdrantClient(path="qdrantdb",port=6333) #path="qdrantdb",port=6333 <- docker || local -> url="http://localhost:6333"
         self.vector_store = Qdrant(client=client,embeddings=self.embeddings,collection_name="db")
         search = self.vector_store.similarity_search(question)
+        client.close()
         if search:
             most_similar_chunk = search[0]
             similar_text = most_similar_chunk.page_content
@@ -52,7 +53,3 @@ class Rag:
             return generated_text
         else:
             return "No relevant information found for your query."
-
-    def close(self):
-        if self.vector_store:
-            self.vector_store.client.close()
