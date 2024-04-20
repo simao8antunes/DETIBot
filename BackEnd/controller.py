@@ -14,7 +14,7 @@ async def root():
 
 @app.get("/detibot/{prompt}")
 async def Question(prompt: str):
-   return query.queries(prompt)
+   return  query.queries(prompt)
     
 
 @app.post("/detibot/insert_source")

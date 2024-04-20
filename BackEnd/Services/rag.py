@@ -11,7 +11,7 @@ class Rag:
     def __init__(self, path=None):
         self.token = "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"
         self.path = path
-        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=50)
+        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=25)
         self.embeddings = HuggingFaceInferenceAPIEmbeddings(
             api_key=self.token,
             model_name="BAAI/bge-base-en-v1.5"
@@ -28,7 +28,7 @@ class Rag:
         index = Qdrant.from_documents(
             chunks,
             embedding=self.embeddings,
-            path="qdrantdb",port=6333, #path="qdrantdb",port=6333 <- docker || local -> url="http://localhost:6333"
+            url="http://qdrantdb:6333", #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
             collection_name="db"
         )
 
