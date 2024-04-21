@@ -1,36 +1,31 @@
 document.getElementById('sendMessage').addEventListener('click', function() {
-    const messageInput = document.getElementById('messageInput');
-    const message = messageInput.value;
+    const message = document.getElementById('messageInput').value;
     if (message.trim() === '') return; // Ignore empty messages
 
+    // Display the user's message immediately in the chat
     const chatHistory = document.querySelector('.chat-history ul');
-
-    function appendMessage(who, text, avatar, time = new Date().toLocaleTimeString()) {
-        const li = document.createElement('li');
-        li.className = 'clearfix';
-        li.innerHTML = `<div class="message-data ${who === 'other' ? 'text-right' : ''}">
-                            <span class="message-data-time">${time}, Today</span>
-                            <img src="${avatar}" alt="avatar">
-                        </div>
-                        <div class="message ${who === 'other' ? 'other-message float-right' : 'my-message'}">${text}</div>`;
-        chatHistory.appendChild(li);
-    }
-
-    // Display user's message immediately
-    appendMessage('other', message, 'https://bootdey.com/img/Content/avatar/avatar7.png');
+    chatHistory.innerHTML += `<li class="clearfix">
+        <div class="message-data text-right">
+            <span class="message-data-time">${new Date().toLocaleTimeString()}, Today</span>
+            <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
+        </div>
+        <div class="message other-message float-right">${message}</div>
+    </li>`;
 
     // Clear input box after sending message
-    messageInput.value = '';
+    document.getElementById('messageInput').value = '';
 
-    // Send message to API using axios
-    axios.get(`http://localhost:8000/detibot/${encodeURIComponent(message)}`)
-        .then(function (response) {
-            // Handle success
-            appendMessage('my', response.data.resposta, 'https://bootdey.com/img/Content/avatar/avatar6.png');
+    // Send message to API and handle response
+    fetch(`http://localhost:8000/detibot/${encodeURIComponent(message)}`)
+        .then(response => response.json())
+        .then(data => {
+            // Assuming 'data' is the response from your API
+            chatHistory.innerHTML += `<li class="clearfix">
+            <div class="message-data">
+                <span class="message-data-time">${new Date().toLocaleTimeString()}, Today</span>
+            </div>
+            <div class="message my-message">${data}</div>
+        </li>`;
         })
-        .catch(function (error) {
-            // Handle error
-            console.error('Error:', error);
-            appendMessage('my', 'Error: Could not retrieve response.', 'https://bootdey.com/img/Content/avatar/avatar6.png');
-        });
+        .catch(error => console.error('Error:', error));
 });
