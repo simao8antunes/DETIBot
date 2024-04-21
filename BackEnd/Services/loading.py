@@ -13,12 +13,18 @@ import os
 from Services.rag import Rag
 
 indexer = Indexing()
-PDF_PATH = "./Data/calend.pdf"
+PDF_PATH = "./Data"
 
-rag = Rag(PDF_PATH)
 class Loading:
     def loader(self):
-        documents = rag.load_documents()
-        print(documents)
-        indexer.index(documents)
-        return {"Loading": "Successfull"}
+        # List all PDF files in the "Data" folder
+        pdf_files = [f for f in os.listdir(PDF_PATH) if f.endswith('.pdf')]
+
+        for pdf_file in pdf_files:
+            pdf_path = os.path.join(PDF_PATH, pdf_file)
+            rag = Rag(pdf_path)
+            documents = rag.load_documents()
+            print(f"Loaded {len(documents)} documents from {pdf_file}")
+            indexer.index(documents)
+
+        return {"Loading": "Successful"}
