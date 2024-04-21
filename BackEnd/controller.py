@@ -4,7 +4,7 @@ from Services import *
 app = FastAPI()
 query = Query()
 load = Loading()
-db = H2()
+db = MySql()
 
 
 

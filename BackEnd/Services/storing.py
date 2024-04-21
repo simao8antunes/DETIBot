@@ -16,7 +16,7 @@ class Qdrantdb:
 
         
 
-class H2:
+class MySql:
     
     def __init__(self):
         
