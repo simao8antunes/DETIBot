@@ -32,20 +32,25 @@ class Rag:
             collection_name="db"
         )
 
+        index.client.close()
 
     def query(self, question):
-        client = QdrantClient(path="qdrantdb",port=6333) #path="qdrantdb",port=6333 <- docker || local -> url="http://localhost:6333"
+        client = QdrantClient(url="http://qdrantdb:6333") #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
         self.vector_store = Qdrant(client=client,embeddings=self.embeddings,collection_name="db")
         search = self.vector_store.similarity_search(question)
         client.close()
         if search:
             most_similar_chunk = search[0]
             similar_text = most_similar_chunk.page_content
+
+            from transformers import pipeline
+            generator = pipeline('text-generation', model='NOVA-vision-language/GlorIA-1.3B')
+            resposta = generator(similar_text, do_sample=True, min_length=50)
             
             tokenizer = AutoTokenizer.from_pretrained("t5-base")
             model = AutoModelForSeq2SeqLM.from_pretrained("t5-base")
             
-            inputs = tokenizer.encode("summarize: " + similar_text, return_tensors="pt", max_length=512, truncation=True)
+            inputs = tokenizer.encode(similar_text, return_tensors="pt", max_length=512, truncation=True)
             
             outputs = model.generate(inputs, max_length=100, num_beams=4, early_stopping=True)
             
