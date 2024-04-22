@@ -19,13 +19,15 @@ document.getElementById('sendMessage').addEventListener('click', function() {
     fetch(`http://localhost:8000/detibot/${encodeURIComponent(message)}`)
         .then(response => response.json())
         .then(data => {
-            // Assuming 'data' is the response from your API
+            console.log('API Response:', data); // Log the full API response to help with debugging
+            // Use the 'query' property from the response data
+            const apiResponse = data.query || 'Response not found'; // Fallback text if 'query' is missing or undefined
             chatHistory.innerHTML += `<li class="clearfix">
-            <div class="message-data">
-                <span class="message-data-time">${new Date().toLocaleTimeString()}, Today</span>
-            </div>
-            <div class="message my-message">${data}</div>
-        </li>`;
+                <div class="message-data">
+                    <span class="message-data-time">${new Date().toLocaleTimeString()}, Today</span>
+                </div>
+                <div class="message my-message">${apiResponse}</div>
+            </li>`;
         })
         .catch(error => console.error('Error:', error));
 });

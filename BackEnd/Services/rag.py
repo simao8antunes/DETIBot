@@ -28,13 +28,13 @@ class Rag:
         index = Qdrant.from_documents(
             chunks,
             embedding=self.embeddings,
-            url="http://qdrantdb:6333", #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
+            url="http://localhost:6333", #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
             collection_name="db"
         )
         index.client.close()
 
     def query(self, question):
-        client = QdrantClient(url="http://qdrantdb:6333") #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
+        client = QdrantClient(url="http://localhost:6333") #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
         self.vector_store = Qdrant(client=client,embeddings=self.embeddings,collection_name="db")
         search = self.vector_store.similarity_search(question)
         client.close()
@@ -50,7 +50,7 @@ class Rag:
             outputs = model.generate(inputs, max_length=100, num_beams=4, early_stopping=True)
             
             generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-
+            
             return generated_text
         else:
             return "No relevant information found for your query."

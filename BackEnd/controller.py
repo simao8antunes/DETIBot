@@ -3,16 +3,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from Services import *
 
 app = FastAPI()
-query = Query()
+procurador = Query()
 load = Loading()
 db = H2()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8081/chat.htlm"],  # You can also use [""] to allow all origins
+    allow_origins=["*"],  # You can also use [""] to allow all origins
     allow_credentials=True,
     allow_methods=[""],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_headers=["*"]  # Allows all headers
 )
 
 
@@ -22,7 +22,8 @@ async def root():
 
 @app.get("/detibot/{prompt}")
 async def Question(prompt: str):
-   return  query.queries(prompt)
+   reposta = procurador.queries(prompt)
+   return  {"resposta": reposta["query"]}
 
     
 
