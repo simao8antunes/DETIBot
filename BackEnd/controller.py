@@ -23,7 +23,7 @@ async def root():
 @app.get("/detibot/{prompt}")
 async def Question(prompt: str):
    reposta = procurador.queries(prompt)
-   return  {"resposta": reposta["query"]}
+   return reposta["query"]
 
     
 

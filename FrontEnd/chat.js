@@ -17,11 +17,10 @@ document.getElementById('sendMessage').addEventListener('click', function() {
 
     // Send message to API and handle response
     fetch(`http://localhost:8000/detibot/${encodeURIComponent(message)}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log('API Response:', data); // Log the full API response to help with debugging
+        .then(response =>  {
+            console.log('API Response:', response); // Log the full API response to help with debugging
             // Use the 'query' property from the response data
-            const apiResponse = data.query || 'Response not found'; // Fallback text if 'query' is missing or undefined
+            const apiResponse = response || 'Response not found'; // Fallback text if 'query' is missing or undefined
             chatHistory.innerHTML += `<li class="clearfix">
                 <div class="message-data">
                     <span class="message-data-time">${new Date().toLocaleTimeString()}, Today</span>
