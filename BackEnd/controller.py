@@ -22,7 +22,7 @@ async def root():
 
 @app.get("/detibot/{prompt}")
 async def Question(prompt: str):
-    return {"resposta": "conectou recebo resposta"}
+   return  query.queries(prompt)
 
     
 
