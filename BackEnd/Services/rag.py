@@ -7,6 +7,9 @@ from langchain_community.document_loaders.pdf import PyPDFLoader
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from qdrant_client import QdrantClient, models
 
+from Services.classes import Source
+from Services.seleniumLoader import SeleniumURLLoaderWithWait
+
 class Rag:
     def __init__(self, path=None):
         self.token = "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"
@@ -21,6 +24,11 @@ class Rag:
     def load_documents(self):
         data = PyPDFLoader(self.path)
         return data.load()
+    
+
+    def load_urls(self, source):
+        loader = SeleniumURLLoaderWithWait(urls=source.url, browser="chrome", headless=True)
+        return loader.load(wait_time=source.wait_time, recursive=source.recursive, paths=source.paths)
 
     def index_documents(self, documents):
         

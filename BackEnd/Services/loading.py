@@ -3,6 +3,9 @@
 #'loader' method.
 #from llama_index.core import SimpleDirectoryReader
 
+from Services.classes import Source
+
+
 from Services.indexing import Indexing
 from langchain_community.vectorstores.qdrant import Qdrant
 from langchain_community.embeddings.huggingface import HuggingFaceInferenceAPIEmbeddings
@@ -17,8 +20,11 @@ PDF_PATH = "./Data/calend.pdf"
 
 rag = Rag(PDF_PATH)
 class Loading:
-    def loader(self):
-        documents = rag.load_documents()
+    def loader(self, source: Source):
+        if source.url: #### ver se é  qual o null ou str ou o crl 
+            documents=rag.load_urls(source)
+        else:
+            documents = rag.load_documents()
         print(documents)
         indexer.index(documents)
         return {"Loading": "Successfull"}
