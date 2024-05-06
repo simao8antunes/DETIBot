@@ -3,6 +3,9 @@
 #'loader' method.
 #from llama_index.core import SimpleDirectoryReader
 
+from Services.classes import Source
+
+
 from Services.indexing import Indexing
 from langchain_community.vectorstores.qdrant import Qdrant
 from langchain_community.embeddings.huggingface import HuggingFaceInferenceAPIEmbeddings
@@ -16,15 +19,14 @@ indexer = Indexing()
 PDF_PATH = "./Data"
 
 class Loading:
-    def loader(self):
-        # List all PDF files in the "Data" folder
-        pdf_files = [f for f in os.listdir(PDF_PATH) if f.endswith('.pdf')]
 
-        for pdf_file in pdf_files:
-            pdf_path = os.path.join(PDF_PATH, pdf_file)
-            rag = Rag(pdf_path)
+    def loader(self, source: Source):
+        if source.loader_type == 'url': 
+            documents=rag.load_urls(source)
+        if source.loader_type == 'pdf': 
             documents = rag.load_documents()
-            print(f"Loaded {len(documents)} documents from {pdf_file}")
-            indexer.index(documents)
+        print(documents)
+        indexer.index(documents)
+        return {"Loading": "Successfull"}
 
-        return {"Loading": "Successful"}
+

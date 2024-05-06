@@ -12,6 +12,9 @@ from langchain.chains.retrieval_qa.base import RetrievalQA
 import textwrap
 
 
+from Services.classes import Source
+from Services.seleniumLoader import SeleniumURLLoaderWithWait
+
 class Rag:
     def __init__(self, path=None):
         self.token = "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"
@@ -30,6 +33,11 @@ class Rag:
     def load_documents(self):
         data = PyPDFLoader(self.path)
         return data.load()
+    
+
+    def load_urls(self, source):
+        loader = SeleniumURLLoaderWithWait(urls=[source.url], browser="chrome", headless=True)
+        return loader.load(wait_time=source.wait_time, recursive=source.recursive, paths=source.paths)
 
     def index_documents(self, documents):
         
@@ -40,10 +48,10 @@ class Rag:
             url="http://localhost:6333", #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
             collection_name="db"
         )
-
+        index.client.close()
 
     def query(self, question):
-        client = QdrantClient(url="http://localhost:6333") #path="qdrantdb",port=6333 <- docker || local -> url="http://localhost:6333"
+        client = QdrantClient(url="http://localhost:6333") #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
         self.vector_store = Qdrant(client=client,embeddings=self.embeddings,collection_name="db")
         retriever = self.vector_store.as_retriever()
 
@@ -74,7 +82,9 @@ class Rag:
 
         response = chain({'query': question})
         client.close()
+
         # Wrapping the text for better output in Jupyter Notebook
         wrapped_text = textwrap.fill(response['result'], width=100)
         print(wrapped_text)
         return wrapped_text
+
