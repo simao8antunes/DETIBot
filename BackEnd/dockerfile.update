@@ -1,13 +1,17 @@
 FROM python:slim
 
-RUN apt update && apt -y install cron tesseract-ocr
+RUN apt update && apt -y install cron
 
 # Setup the python aplication
-#COPY requirements.txt requirements.txt
-#RUN pip install -r requirements.txt
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+
+COPY /Services /root/Services
+
+COPY init.py /root/init.py
 
 # Copy the main program
-COPY test.py /root/test.py
+COPY update.py /root/update.py
 COPY run.sh /root/run.sh
 RUN chmod 0744 /root/run.sh
 
@@ -28,6 +32,8 @@ RUN sed -i '/session    required     pam_loginuid.so/c\#session    required     
 
 # Set the Work Directory
 WORKDIR /root
+
+RUN python init.py
 
 # Run the cron on container startup
 CMD ["cron", "-f"]
