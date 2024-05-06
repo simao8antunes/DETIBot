@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.DEBUG)
 logging.debug("Starting the update; %s",datetime.now())
 
 date = datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)
-result_time_table = db.get("SELECT id FROM update_time WHERE update_period = %s",[date])
+result_time_table = db.get("SELECT id FROM update_time WHERE update_period <= %s",[date])
 logging.debug("Query result for date: %s is: %s; %s",date,result_time_table,datetime.now())
 
 for i in result_time_table:

@@ -8,8 +8,6 @@ RUN pip install -r requirements.txt
 
 COPY /Services /root/Services
 
-COPY init.py /root/init.py
-
 # Copy the main program
 COPY update.py /root/update.py
 COPY run.sh /root/run.sh
@@ -32,8 +30,6 @@ RUN sed -i '/session    required     pam_loginuid.so/c\#session    required     
 
 # Set the Work Directory
 WORKDIR /root
-
-RUN python init.py
 
 # Run the cron on container startup
 CMD ["cron", "-f"]
