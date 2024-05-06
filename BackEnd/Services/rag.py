@@ -1,21 +1,30 @@
 # rag.py
 
 from langchain_community.vectorstores.qdrant import Qdrant
-from langchain_community.embeddings.huggingface import HuggingFaceInferenceAPIEmbeddings
+from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders.pdf import PyPDFLoader
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from qdrant_client import QdrantClient, models
+from langchain_community.llms.ollama import Ollama
+from langchain_core.prompts import PromptTemplate
+from langchain.chains.retrieval_qa.base import RetrievalQA
+import textwrap
+
 
 class Rag:
     def __init__(self, path=None):
         self.token = "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"
+        self.llm = Ollama(model="llama2", temperature=0)
         self.path = path
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=25)
-        self.embeddings = HuggingFaceInferenceAPIEmbeddings(
-            api_key=self.token,
-            model_name="BAAI/bge-base-en-v1.5"
-        )
+        self.embeddings = HuggingFaceEmbeddings(
+        model_name="all-MiniLM-L6-v2",
+        model_kwargs={'device':'cpu'}, # here we will run the model with CPU only
+        encode_kwargs = {
+            'normalize_embeddings': True # keep True to compute cosine similarity
+        }
+    )
 
 
     def load_documents(self):
@@ -28,28 +37,44 @@ class Rag:
         index = Qdrant.from_documents(
             chunks,
             embedding=self.embeddings,
-            url="http://qdrantdb:6333", #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
+            url="http://localhost:6333", #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
             collection_name="db"
         )
 
 
     def query(self, question):
-        client = QdrantClient(path="qdrantdb",port=6333) #path="qdrantdb",port=6333 <- docker || local -> url="http://localhost:6333"
+        client = QdrantClient(url="http://localhost:6333") #path="qdrantdb",port=6333 <- docker || local -> url="http://localhost:6333"
         self.vector_store = Qdrant(client=client,embeddings=self.embeddings,collection_name="db")
-        search = self.vector_store.similarity_search(question)
+        retriever = self.vector_store.as_retriever()
+
+        template = """
+        ### System:
+        You are an respectful and honest assistant. You have to answer the user's questions using only the context \
+        provided to you. If you don't know the answer, just say you don't know. Don't try to make up an answer.
+
+        ### Context:
+        {context}
+
+        ### User:
+        {question}
+
+        ### Response:
+        """
+
+        # Creating the prompt from the template which we created before
+        prompt = PromptTemplate.from_template(template)
+
+        chain = RetrievalQA.from_chain_type(
+            llm=self.llm,
+            retriever=retriever, # here we are using the vectorstore as a retriever
+            chain_type="stuff",
+            return_source_documents=True, # including source documents in output
+            chain_type_kwargs={'prompt': prompt} # customizing the prompt
+        )
+
+        response = chain({'query': question})
         client.close()
-        if search:
-            most_similar_chunk = search[0]
-            similar_text = most_similar_chunk.page_content
-            
-            tokenizer = AutoTokenizer.from_pretrained("t5-base")
-            model = AutoModelForSeq2SeqLM.from_pretrained("t5-base")
-            
-            inputs = tokenizer.encode("summarize: " + similar_text, return_tensors="pt", max_length=512, truncation=True)
-            
-            outputs = model.generate(inputs, max_length=100, num_beams=4, early_stopping=True)
-            
-            generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-            return generated_text
-        else:
-            return "No relevant information found for your query."
+        # Wrapping the text for better output in Jupyter Notebook
+        wrapped_text = textwrap.fill(response['result'], width=100)
+        print(wrapped_text)
+        return wrapped_text
