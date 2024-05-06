@@ -30,6 +30,6 @@ async def Question(prompt: str):
 @app.post("/detibot/insert_source")
 async def KnowledgeSource(source: Source):
     #inserts the source object into the db
-    #db.insert_source(source)
+    db.insert_source(source)
     #loads the new source object
     load.loader(source)

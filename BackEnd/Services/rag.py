@@ -27,7 +27,7 @@ class Rag:
     
 
     def load_urls(self, source):
-        loader = SeleniumURLLoaderWithWait(urls=source.url, browser="chrome", headless=True)
+        loader = SeleniumURLLoaderWithWait(urls=[source.url], browser="chrome", headless=True)
         return loader.load(wait_time=source.wait_time, recursive=source.recursive, paths=source.paths)
 
     def index_documents(self, documents):

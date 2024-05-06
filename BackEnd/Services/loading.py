@@ -21,9 +21,9 @@ PDF_PATH = "./Data/calend.pdf"
 rag = Rag(PDF_PATH)
 class Loading:
     def loader(self, source: Source):
-        if source.url: #### ver se é  qual o null ou str ou o crl 
+        if source.loader_type == 'url': 
             documents=rag.load_urls(source)
-        else:
+        if source.loader_type == 'pdf': 
             documents = rag.load_documents()
         print(documents)
         indexer.index(documents)
