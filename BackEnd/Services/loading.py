@@ -16,10 +16,10 @@ import os
 from Services.rag import Rag
 
 indexer = Indexing()
-PDF_PATH = "./Data/calend.pdf"
+PDF_PATH = "./Data"
 
-rag = Rag(PDF_PATH)
 class Loading:
+
     def loader(self, source: Source):
         if source.loader_type == 'url': 
             documents=rag.load_urls(source)
@@ -28,3 +28,5 @@ class Loading:
         print(documents)
         indexer.index(documents)
         return {"Loading": "Successfull"}
+
+
