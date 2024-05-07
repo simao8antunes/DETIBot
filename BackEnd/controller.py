@@ -32,4 +32,4 @@ async def KnowledgeSource(source: Source):
     #inserts the source object into the db
     db.insert_source(source)
     #loads the new source object
-    load.loader()
+    load.loader(source)

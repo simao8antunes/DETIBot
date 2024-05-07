@@ -39,7 +39,8 @@ class MySql:
             print("Error connecting to MySQL:", e)
 
     def insert_source(self,source:Source):# inserts the source object 
-        insert_sql = "INSERT INTO source (url_path,loader_type,descript,update_period_id) VALUES (%s,%s,%s,%s)"
+        #insert_sql = "INSERT INTO source (url_path,loader_type,descript,update_period_id) VALUES (%s,%s,%s,%s)"
+        insert_sql = "INSERT INTO source (url_path, link_paths, loader_type, descript, wait_time, recursive_url, update_period_id) VALUES (%s, %s, %s, %s, %s, %s, %s)"
         Id = 0
         if source.update_period == "Daily":
             Id = 1
@@ -50,7 +51,15 @@ class MySql:
         elif source.update_period == 'Quarter':
             Id = 4
         try:
-            self.cursor.execute(insert_sql, (source.url,source.loader_type,source.description,Id)) # maybe put here a logger and a try/ctach
+            link_paths_str = ','.join(source.paths)
+            self.cursor.execute(insert_sql, (source.url,
+                                             link_paths_str,
+                                             source.loader_type,
+                                             source.description,
+                                             source.wait_time,
+                                             source.recursive,
+                                             Id 
+                                             )) # maybe put here a logger and a try/ctach
             self.conn.commit()
         except mysql.connector.Error as e:
             print("Error inserting to MySQL:", e)

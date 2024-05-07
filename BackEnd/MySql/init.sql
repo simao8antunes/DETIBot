@@ -11,8 +11,11 @@ CREATE TABLE IF NOT EXISTS update_time (
 CREATE TABLE IF NOT EXISTS source (
     id INT AUTO_INCREMENT PRIMARY KEY,
     url_path VARCHAR(255),
+    link_paths VARCHAR(255),
     loader_type VARCHAR(255),
     descript VARCHAR(255),
+    wait_time INT,
+    recursive_url boolean,
     update_period_id INT,
     FOREIGN KEY (update_period_id) REFERENCES update_time (id)
 );
