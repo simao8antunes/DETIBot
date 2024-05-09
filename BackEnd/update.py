@@ -20,7 +20,8 @@ for i in result_time_table:
 
     for item in result_source_table:
         logging.debug("The following Source is being updated: %s; %s",item,datetime.now())
-        fonte = Source(url=item[0],paths=[item[1]],loader_type=item[2],description=item[3],wait_time=item[4],recursive=item[5],update_period=item[6])
+        link_paths = item[1].split(',')
+        fonte = Source(url=item[0],paths=link_paths,loader_type=item[2],description=item[3],wait_time=item[4],recursive=item[5],update_period=item[6])
         load.loader(fonte)
 
 for i in result_time_table:
