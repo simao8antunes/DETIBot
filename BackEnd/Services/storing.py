@@ -2,20 +2,9 @@
 #To execute the neccessary methods to store data.  
 #In this file we have 2 classes: "Qdrant" and "H2".
 #This classes provide the necessary methods to Insert, Delete or modify data in Qdrant and H2.
-from Services.classes import Source
+from classes import Source
 from datetime import datetime, timedelta
-import mysql.connector
-from qdrant_client import QdrantClient
-
-class Qdrantdb:
-    
-    def __init__(self):
-        
-        
-       pass
-
-        
-
+import mysql.connector  
 class MySql:
     
     def __init__(self):
