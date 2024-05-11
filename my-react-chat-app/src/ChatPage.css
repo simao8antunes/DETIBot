@@ -1,0 +1,38 @@
+/* ChatPage.css */
+
+.chat-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 15px; /* Rounded corners for the container */
+}
+
+.message-wrapper {
+    display: flex;
+    margin-bottom: 8px;
+}
+
+.user-message {
+    justify-content: flex-end;
+}
+
+.api-message {
+    justify-content: flex-start;
+}
+
+.message-bubble {
+    max-width: 60%;
+    padding: 8px;
+    border-radius: 10px; /* Rounding the corners of message bubbles */
+}
+
+.user-bubble {
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white;
+}
+
+.api-bubble {
+    background-color: #f8f9fa; /* Bootstrap light color */
+    color: black;
+}

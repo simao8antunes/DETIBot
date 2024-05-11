@@ -5,16 +5,6 @@
 from Services.classes import Source
 from datetime import datetime, timedelta
 import mysql.connector
-from qdrant_client import QdrantClient
-
-class Qdrantdb:
-    
-    def __init__(self):
-        
-        
-       pass
-
-        
 
 class MySql:
     
@@ -23,7 +13,7 @@ class MySql:
         # Connect to MySQL
         try:
             self.conn = mysql.connector.connect(
-                host="mysqldb", #host="mysqldb" <-docker || local -> host="localhost"
+                host="localhost", #host="mysqldb" <-docker || local -> host="localhost"
                 user="bot",
                 password="pi2024",
                 database="Detibot"
