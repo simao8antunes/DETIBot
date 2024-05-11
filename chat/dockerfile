@@ -1,0 +1,20 @@
+FROM node:alpine
+
+COPY package.json /root/package.json
+COPY package-lock.json /root/package-lock.json
+COPY /public /root/public
+COPY /src /root/src
+
+WORKDIR /root
+
+# Install dependencies
+RUN npm install
+
+# Build the React app
+RUN npm run build
+
+# Expose port 3000 ola
+EXPOSE 3000
+
+# Command to run the React app
+CMD ["npm", "start"]
