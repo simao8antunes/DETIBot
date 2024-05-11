@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../ChatPage.css';
 
+const API_ADDR = "localhost:8000";
+
 const ChatPage = () => {
     const [messages, setMessages] = useState([]); // State for storing chat messages
     const [newMessage, setNewMessage] = useState(''); // State for the current input
@@ -23,7 +25,7 @@ const ChatPage = () => {
 
             // Send the user's message to the API and handle the response
             try {
-                const url = `http://localhost:8000/detibot/${encodeURIComponent(newMessage)}`;
+                const url = `http://${API_ADDR}/detibot/${encodeURIComponent(newMessage)}`;
                 const response = await axios.get(url);
                 console.log(response)
 
