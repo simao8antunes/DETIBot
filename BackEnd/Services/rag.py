@@ -4,8 +4,7 @@ from langchain_community.vectorstores.qdrant import Qdrant
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders.pdf import PyPDFLoader
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-from qdrant_client import QdrantClient, models
+from qdrant_client import QdrantClient
 from langchain_community.llms.ollama import Ollama
 from langchain_core.prompts import PromptTemplate
 from langchain.chains.retrieval_qa.base import RetrievalQA
@@ -18,7 +17,7 @@ from Services.seleniumLoader import SeleniumURLLoaderWithWait
 class Rag:
     def __init__(self, path=None):
         self.token = "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"
-        self.llm = Ollama(model="llama2", temperature=0)
+        self.llm = Ollama(model="llama2", temperature=0) # ,base_url="http://ollama:11434" <- docker || local -> sem o ,base_url="http://ollama:11434"
         self.path = path
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=25)
         self.embeddings = HuggingFaceEmbeddings(
@@ -31,11 +30,11 @@ class Rag:
 
 
     def load_documents(self):
-        data = PyPDFLoader(self.path)
+        data = PyPDFLoader("./Data/info.pdf")
         return data.load()
     
 
-    def load_urls(self, source):
+    def load_urls(self, source:Source):
         loader = SeleniumURLLoaderWithWait(urls=[source.url], browser="chrome", headless=True)
         return loader.load(wait_time=source.wait_time, recursive=source.recursive, paths=source.paths)
 

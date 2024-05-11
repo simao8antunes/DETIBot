@@ -43,10 +43,6 @@ services:
       depends_on:
         - qdrant
         - mysql
-      #  rabbitmq:
-      #    condition: service_healthy
-      #links:
-      #  - rabbitmq
 
     update:
       build: 
@@ -58,8 +54,13 @@ services:
       environment:
         - TZ=Europe/Lisbon
 
-      #depends_on:
-      #  rabbitmq:
-      #    condition: service_healthy
-      #links:
-      #  - rabbitmq
+    ollama:
+      image: ollama/ollama:latest
+      container_name: ollama
+      ports:
+        - "11434:11434"
+      volumes:
+        - ollama_data:/root/.ollama
+
+volumes:
+  ollama_data:

@@ -5,16 +5,6 @@
 from Services.classes import Source
 from datetime import datetime, timedelta
 import mysql.connector
-from qdrant_client import QdrantClient
-
-class Qdrantdb:
-    
-    def __init__(self):
-        
-        
-       pass
-
-        
 
 class MySql:
     

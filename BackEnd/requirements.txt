@@ -12,3 +12,5 @@ pypdf
 torch
 selenium
 unstructured
+langchain
+sentence-transformers

@@ -17,6 +17,7 @@ from Services.rag import Rag
 
 indexer = Indexing()
 PDF_PATH = "./Data"
+rag = Rag()
 
 class Loading:
 
