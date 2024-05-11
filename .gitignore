@@ -2,4 +2,3 @@ venv/
 BackEnd/_pycache_/
 BackEnd/Services/_pycache_/
 .DS_Store
-.my-react-chat-app/node_modules/
