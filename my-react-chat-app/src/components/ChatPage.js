@@ -25,14 +25,16 @@ const ChatPage = () => {
             try {
                 const url = `http://localhost:8000/detibot/${encodeURIComponent(newMessage)}`;
                 const response = await axios.get(url);
+                console.log(response)
 
                 // Handle the API response
-                if (response.data && response.data.reply) {
+                if (response.data) {
                     const apiResponse = {
-                        text: response.data.reply,
+                        text: response.data,
                         isUser: false, // Indicates the message is from the API
                     };
                     // Add the API response to the list of messages
+                    
                     setMessages((prevMessages) => [...prevMessages, apiResponse]);
                 }
             } catch (error) {

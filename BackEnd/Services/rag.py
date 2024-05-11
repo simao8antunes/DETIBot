@@ -17,7 +17,7 @@ from Services.seleniumLoader import SeleniumURLLoaderWithWait
 class Rag:
     def __init__(self, path=None):
         self.token = "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"
-        self.llm = Ollama(model="llama2", temperature=0,base_url="http://ollama:11434" ) # ,base_url="http://ollama:11434" <- docker || local -> sem o ,base_url="http://ollama:11434"
+        self.llm = Ollama(model="llama2", temperature=0) # ,base_url="http://ollama:11434" <- docker || local -> sem o ,base_url="http://ollama:11434"
         self.path = path
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=25)
         self.embeddings = HuggingFaceEmbeddings(
@@ -44,13 +44,13 @@ class Rag:
         index = Qdrant.from_documents(
             chunks,
             embedding=self.embeddings,
-            url="http://qdrantdb:6333", #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
+            url="http://localhost:6333", #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
             collection_name="db"
         )
         index.client.close()
 
     def query(self, question):
-        client = QdrantClient(url="http://qdrantdb:6333") #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
+        client = QdrantClient(url="http://localhost:6333") #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
         self.vector_store = Qdrant(client=client,embeddings=self.embeddings,collection_name="db")
         retriever = self.vector_store.as_retriever()
 
