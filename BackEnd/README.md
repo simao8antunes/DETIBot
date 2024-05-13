@@ -8,10 +8,8 @@ para colocar o backend a funcionar é necessário:
 
     -> mysql: 
 
-    -> ollama: para além de blah blah blah ou depois de blah blah blah fazer o seguinte:
-
-        -> docker desktop: ir ao container ollama entrar no tab Exec e escrever o seguinte comando: ollama run llama2/(llm escolhido suportado pelo ollama)
-        -> command line: ns se dá tenho de ver 
+    -> ollama: dps de verificar q o container está a rodar fazer na linha de comandos:
+        -> docker exec -it ollama ollama run llama2/(outro llm suportado pelo ollama)
 
 3- apôs os passos acima estarem compridos e verificados rodar o backend: 
     
