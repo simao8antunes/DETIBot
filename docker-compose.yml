@@ -62,5 +62,17 @@ services:
       volumes:
         - ollama_data:/root/.ollama
 
+    chat:
+      build: ./chat
+      image: chat
+      container_name: chat
+      ports:
+        - "3000:3000"
+      volumes:
+        - .:/app
+      stdin_open: true
+      #depends_on:
+      #  - api
+
 volumes:
   ollama_data:
