@@ -39,8 +39,12 @@ const MyForm = () => {
     };
 
     try {
-      // Make the POST request
-      const response = await axios.post('detibot/insert_source', data);
+      // Make the POST request using Axios
+      const response = await axios.post('http://localhost:8000/detibot/insert_source', data, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       console.log('API response:', response.data);
     } catch (error) {
       console.error('Error:', error);
