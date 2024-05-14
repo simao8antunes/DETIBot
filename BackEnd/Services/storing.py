@@ -2,7 +2,7 @@
 #To execute the neccessary methods to store data.  
 #In this file we have 2 classes: "Qdrant" and "H2".
 #This classes provide the necessary methods to Insert, Delete or modify data in Qdrant and H2.
-from Services.classes import Source
+from Services import File_Source, URL_Source
 from datetime import datetime, timedelta
 import mysql.connector
 
@@ -28,9 +28,8 @@ class MySql:
         except mysql.connector.Error as e:
             print("Error connecting to MySQL:", e)
 
-    def insert_source(self,source:Source):# inserts the source object 
+    def insert_source(self,source):# inserts the source object 
         #insert_sql = "INSERT INTO source (url_path,loader_type,descript,update_period_id) VALUES (%s,%s,%s,%s)"
-        insert_sql = "INSERT INTO source (url_path, link_paths, loader_type, descript, wait_time, recursive_url, update_period_id) VALUES (%s, %s, %s, %s, %s, %s, %s)"
         Id = 0
         if source.update_period == "Daily":
             Id = 1
@@ -40,22 +39,36 @@ class MySql:
             Id = 3
         elif source.update_period == 'Quarter':
             Id = 4
+        
+        
+        if isinstance(source, File_Source): 
+            insert_sql = (
+                "INSERT INTO file_source "
+                "(url_path, loader_type, descript, update_period_id) "
+                "VALUES (%s, %s, %s, %s)"
+            )
+            params = (source.url, source.loader_type, source.description, Id)
+        elif isinstance(source, URL_Source):
+            insert_sql = (
+                "INSERT INTO url_source "
+                "(url_link, paths, descript, wait_time, recursive_url, update_period_id) "
+                "VALUES (%s, %s, %s, %s, %s, %s)"
+            )
+            params = (source.url, ','.join(source.paths), source.description, source.wait_time, source.recursive, Id)
+        else:
+            return "Invalid source type"
+        
+
+
         try:
-            link_paths_str = ','.join(source.paths)
-            self.cursor.execute(insert_sql, (source.url,
-                                             link_paths_str,
-                                             source.loader_type,
-                                             source.description,
-                                             source.wait_time,
-                                             source.recursive,
-                                             Id 
-                                             )) # maybe put here a logger and a try/ctach
+            self.cursor.execute(insert_sql,params) # maybe put here a logger and a try/ctach
             self.conn.commit()
         except mysql.connector.Error as e:
             print("Error inserting to MySQL:", e)
-    def update_source(self,source:Source):# updates the source object 
+
+    def update_source(self,source):# updates the source object 
         pass
-    def delete_source(self,source:Source):# deletes the source object  
+    def delete_source(self,source):# deletes the source object  
         pass
 
     def update_time(self,idx):# updates the period time in the update time table 
