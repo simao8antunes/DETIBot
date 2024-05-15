@@ -31,7 +31,7 @@ const MyForm = () => {
     const data = {
       url: sourceType === 'url' ? sourceValue : '',
       paths: [],
-      loader_type: sourceType === 'file' ? 'file' : 'email',
+      loader_type: sourceType === 'file' ? 'file' : 'url',
       update_period: frequency,
       description: description,
       wait_time: 3,
@@ -39,8 +39,9 @@ const MyForm = () => {
     };
 
     try {
+      console.log(data)
       // Make the POST request using Axios
-      const response = await axios.post('http://localhost:8000/detibot/insert_source', data, {
+      const response = await axios.post('http://localhost:8000/detibot/insert_urlsource', data, {
         headers: {
           'Content-Type': 'application/json'
         }
