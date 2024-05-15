@@ -27,9 +27,17 @@ async def Question(prompt: str):
 
     
 
-@app.post("/detibot/insert_source")
-async def KnowledgeSource(source: Source):
+@app.post("/detibot/insert_filesource")
+async def KnowledgeSource(source: File_Source):
     #inserts the source object into the db
     db.insert_source(source)
     #loads the new source object
-    load.loader(source)
+    load.file_loader(source)
+
+
+@app.post("/detibot/insert_urlsource")
+async def KnowledgeSource(source: URL_Source):
+    #inserts the source object into the db
+    db.insert_source(source)
+    #loads the new source object
+    load.url_loader(source)

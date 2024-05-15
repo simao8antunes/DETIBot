@@ -1,5 +1,4 @@
 # rag.py
-
 from langchain_community.vectorstores.qdrant import Qdrant
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -11,8 +10,8 @@ from langchain.chains.retrieval_qa.base import RetrievalQA
 import textwrap
 
 
-from Services.classes import Source
 from Services.seleniumLoader import SeleniumURLLoaderWithWait
+from Services import URL_Source
 
 class Rag:
     def __init__(self, path=None):
@@ -34,7 +33,7 @@ class Rag:
         return data.load()
     
 
-    def load_urls(self, source:Source):
+    def load_urls(self, source:URL_Source):
         loader = SeleniumURLLoaderWithWait(urls=[source.url], browser="chrome", headless=True)
         return loader.load(wait_time=source.wait_time, recursive=source.recursive, paths=source.paths)
 
