@@ -1,19 +1,34 @@
 import React, { useState } from 'react';
-import { Form, Button, Card } from 'react-bootstrap';
+import { Form, Button, Card, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
 const MyForm = () => {
   const [sourceType, setSourceType] = useState('');
-  const [sourceValue, setSourceValue] = useState('');
+  const [file, setFile] = useState(null); // Using null instead of empty string for file
+  const [url, setUrl] = useState('');
   const [description, setDescription] = useState('');
   const [frequency, setFrequency] = useState('');
+  const [recursive, setRecursive] = useState(false);
+  const [pathsEnabled, setPathsEnabled] = useState(false);
+  const [paths, setPaths] = useState([]);
 
   const handleSourceTypeChange = (event) => {
     setSourceType(event.target.value);
+    // Reset paths and other related state when changing source type
+    setPathsEnabled(false);
+    setPaths([]);
+    setRecursive(false);
+    // Reset file and url inputs
+    setFile(null);
+    setUrl('');
   };
 
-  const handleSourceValueChange = (event) => {
-    setSourceValue(event.target.value);
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]); // Set the file object directly
+  };
+
+  const handleUrlChange = (event) => {
+    setUrl(event.target.value);
   };
 
   const handleDescriptionChange = (event) => {
@@ -24,24 +39,54 @@ const MyForm = () => {
     setFrequency(event.target.value);
   };
 
+  const handleRecursiveChange = () => {
+    setRecursive(!recursive);
+  };
+
+  const handlePathsEnabledChange = () => {
+    setPathsEnabled(!pathsEnabled);
+  };
+
+  const handlePathChange = (event, index) => {
+    const newPaths = [...paths];
+    newPaths[index] = event.target.value;
+    setPaths(newPaths);
+  };
+
+  const handleAddPath = () => {
+    setPaths([...paths, '']);
+  };
+
+  const handleRemovePath = (index) => {
+    const newPaths = [...paths];
+    newPaths.splice(index, 1);
+    setPaths(newPaths);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     
     // Prepare data for the API call
     const data = {
-      url: sourceType === 'url' ? sourceValue : '',
-      paths: [],
+      url: sourceType === 'url' ? url : '',
+      paths: pathsEnabled ? paths : [],
       loader_type: sourceType === 'file' ? 'file' : 'url',
       update_period: frequency,
       description: description,
       wait_time: 3,
-      recursive: false
+      recursive: recursive
     };
 
+    let apiUrl = '';
+    if (sourceType === 'url') {
+      apiUrl = 'http://localhost:8000/detibot/insert_urlsource';
+    } else if (sourceType === 'file') {
+      apiUrl = 'http://localhost:8000/detibot/insert_filesource';
+    }
+
     try {
-      console.log(data)
       // Make the POST request using Axios
-      const response = await axios.post('http://localhost:8000/detibot/insert_urlsource', data, {
+      const response = await axios.post(apiUrl, data, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -63,14 +108,6 @@ const MyForm = () => {
               <div>
                 <Form.Check
                   type="radio"
-                  label="Email"
-                  value="email"
-                  checked={sourceType === 'email'}
-                  onChange={handleSourceTypeChange}
-                  style={{ marginLeft: '10px', color: '#1e90ff' }}
-                />
-                <Form.Check
-                  type="radio"
                   label="File"
                   value="file"
                   checked={sourceType === 'file'}
@@ -88,28 +125,67 @@ const MyForm = () => {
               </div>
             </Form.Group>
 
-            {sourceType === 'file' && (
-              <Form.Group controlId="file">
-                <Form.Label>Upload File:</Form.Label>
+            <Form.Group controlId="sourceValue">
+              <Form.Label>{sourceType === 'file' ? 'Upload File:' : 'URL:'}</Form.Label>
+              {sourceType === 'file' ? (
                 <Form.Control
                   type="file"
-                  onChange={handleSourceValueChange}
+                  onChange={handleFileChange}
                   style={{ color: '#1e90ff' }}
                 />
-              </Form.Group>
-            )}
-
-            {sourceType !== 'file' && (
-              <Form.Group controlId="sourceValue">
-                <Form.Label>{sourceType === 'email' ? 'Email Address:' : 'URL:'}</Form.Label>
+              ) : (
                 <Form.Control
-                  type={sourceType === 'email' ? 'email' : 'text'}
-                  placeholder={sourceType === 'email' ? 'Enter email address' : 'Enter URL'}
-                  value={sourceValue}
-                  onChange={handleSourceValueChange}
+                  type="text"
+                  placeholder={sourceType === 'file' ? 'Choose file' : 'Enter URL'}
+                  value={url}
+                  onChange={handleUrlChange}
                   style={{ color: '#1e90ff' }}
                 />
-              </Form.Group>
+              )}
+            </Form.Group>
+
+            {sourceType === 'url' && (
+              <>
+                <Form.Group controlId="recursive">
+                  <Form.Check
+                    type="checkbox"
+                    label="Recursive"
+                    checked={recursive}
+                    onChange={handleRecursiveChange}
+                    style={{ marginLeft: '10px', color: '#1e90ff' }}
+                  />
+                </Form.Group>
+                <Form.Group controlId="pathsEnabled">
+                  <Form.Check
+                    type="switch"
+                    label="Enable Paths"
+                    checked={pathsEnabled}
+                    onChange={handlePathsEnabledChange}
+                    style={{ marginLeft: '10px', color: '#1e90ff' }}
+                  />
+                </Form.Group>
+                {pathsEnabled && (
+                  <>
+                    {paths.map((path, index) => (
+                      <Row key={index} className="mb-2">
+                        <Col>
+                          <Form.Control
+                            type="text"
+                            placeholder="Enter path"
+                            value={path}
+                            onChange={(event) => handlePathChange(event, index)}
+                            style={{ color: '#1e90ff' }}
+                          />
+                        </Col>
+                        <Col xs="auto">
+                          <Button variant="danger" onClick={() => handleRemovePath(index)}>Remove</Button>
+                        </Col>
+                      </Row>
+                    ))}
+                    <Button variant="primary" onClick={handleAddPath}>Add Path</Button>
+                  </>
+                )}
+              </>
             )}
 
             <Form.Group controlId="description">
