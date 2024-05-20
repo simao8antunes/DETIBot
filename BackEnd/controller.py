@@ -47,7 +47,6 @@ async def SourceFile(file: UploadFile = File(...), descript: str = Form(...)):
     with open(file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
-    print(file.content_type)
     source = File_Source(file_name=file.filename,file_path=file_location,loader_type=file.content_type,description=descript)
     #inserts the source object into the db
     db.insert_source(source)
@@ -93,10 +92,10 @@ async def updateFileSource(id: int,file: UploadFile = File(...), descript: str =
     if os.path.exists(current_source[0]):
         os.remove(current_source[0])
     
-    new_file_location = os.path.join(UPLOAD_FOLDER, file.filename)
-    with open(new_file_location, "wb") as buffer:
+    file_location = os.path.join(UPLOAD_FOLDER, file.filename)
+    with open(file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    updated_source = File_Source(file.filename, new_file_location, file.content_type, descript)
+    updated_source = File_Source(file_name=file.filename,file_path=file_location,loader_type=file.content_type,description=descript)
     db.update_file_source(id, updated_source)
     load.file_loader(updated_source)

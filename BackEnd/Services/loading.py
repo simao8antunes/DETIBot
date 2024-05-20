@@ -28,15 +28,15 @@ class Loading:
     
     def file_loader(self, source: File_Source):
         qstore.delete_vectors(source.file_path)
-        if source.loader_type == "pdf":
+        if source.loader_type == "application/pdf":
             documents = self.load_pdf(source)
-        elif source.loader_type == "csv":
+        elif source.loader_type == "application/csv":
             documents = self.load_csv(source)
-        elif source.loader_type == "docx":
+        elif source.loader_type == "application/docx":
             documents = self.load_docx(source)
-        elif source.loader_type == "json":
+        elif source.loader_type == "application/json":
             documents = self.load_csv(source)
-        elif source.loader_type == "html":
+        elif source.loader_type == "application/html":
             documents = self.load_json(source)
         else:
             documents = self.load_text(source)

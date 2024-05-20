@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Button, Card, Row, Col, Tabs, Tab } from 'react-bootstrap';
+import { Form, Button, Card, Row, Col, Tabs, Tab, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
 const API_ADDR = "localhost:8000";
@@ -13,6 +13,7 @@ const MyForm = () => {
   const [recursive, setRecursive] = useState(false);
   const [pathsEnabled, setPathsEnabled] = useState(false);
   const [paths, setPaths] = useState([]);
+  const [loading, setLoading] = useState(false); // Loading state
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]); // Set the file object directly
@@ -56,6 +57,7 @@ const MyForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true); // Set loading to true on submit
 
     let apiUrl = '';
     let data = new FormData();
@@ -84,8 +86,17 @@ const MyForm = () => {
         }
       });
       console.log('API response:', response.data);
+      setLoading(false); // Set loading to false after response
+      setFile(null); // Using null instead of empty string for file
+      setUrl('');
+      setDescription('');
+      setFrequency('');
+      setRecursive(false);
+      setPathsEnabled(false);
+      setPaths([]);
     } catch (error) {
       console.error('Error:', error);
+      setLoading(false); // Set loading to false if there's an error
     }
   };
 
@@ -121,8 +132,8 @@ const MyForm = () => {
                   />
                 </Form.Group>
                 <br />
-                <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }}>
-                  Submit
+                <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }} disabled={loading}>
+                  {loading ? <Spinner animation="border" size="sm" /> : 'Submit'}
                 </Button>
               </Form>
             </Tab>
@@ -203,8 +214,8 @@ const MyForm = () => {
                   </Form.Control>
                 </Form.Group>
                 <br />
-                <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }}>
-                  Submit
+                <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }} disabled={loading}>
+                  {loading ? <Spinner animation="border" size="sm" /> : 'Submit'}
                 </Button>
               </Form>
             </Tab>
