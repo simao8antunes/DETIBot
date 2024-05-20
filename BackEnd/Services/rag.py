@@ -84,6 +84,7 @@ class Rag:
 
         # Wrapping the text for better output in Jupyter Notebook
         wrapped_text = textwrap.fill(response['result'], width=100)
-        print(wrapped_text)
-        return wrapped_text
+        texto_sem_quebras = wrapped_text.replace("\n", " ")
+        print(texto_sem_quebras)
+        return texto_sem_quebras
 
