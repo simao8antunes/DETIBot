@@ -3,33 +3,29 @@
 #'loader' method.
 #from llama_index.core import SimpleDirectoryReader
 
-from Services.classes import URL_Source, File_Source
+from Services import URL_Source, File_Source,Indexing,QStore
 
-
-from Services.indexing import Indexing
-from langchain_community.vectorstores.qdrant import Qdrant
-from langchain_community.embeddings.huggingface import HuggingFaceInferenceAPIEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders.pdf import PyPDFLoader
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from langchain_community.document_loaders import Docx2txtLoader, CSVLoader, JSONLoader, UnstructuredHTMLLoader, TextLoader
 
 import os
-from Services.rag import Rag
+from Services import urlLoader,Rag
 
+qstore = QStore()
 indexer = Indexing()
 PDF_PATH = "./Data"
 rag = Rag()
 
 class Loading:
 
-
     def url_loader(self, source: URL_Source):
-        documents=rag.load_urls(source)
+        qstore.delete_vectors(source.url)
+        documents=self.load_urls(source)
         indexer.index(documents)
         return {"Loading": "Successfull"}
     
     def file_loader(self, source: File_Source):
+        qstore.delete_vectors(source.file_path)
         if source.loader_type == "pdf":
             documents = self.load_pdf()
         elif source.loader_type == "csv":
@@ -69,6 +65,11 @@ class Loading:
     def load_pdf(self, source):
         loader = PyPDFLoader(file_path=source.url)
         return loader.load()
+    
+    def load_urls(self, source:URL_Source):
+        loader = urlLoader(urls=[source.url], browser="chrome", headless=True)
+        return loader.load(wait_time=source.wait_time, recursive=source.recursive, paths=source.paths)
+
     
 
 

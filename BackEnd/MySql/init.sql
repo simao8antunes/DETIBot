@@ -21,11 +21,10 @@ CREATE TABLE IF NOT EXISTS url_source (
 
 CREATE TABLE IF NOT EXISTS file_source (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    url_path VARCHAR(255),
+    file_name VARCHAR(255),
+    file_path VARCHAR(255),
     loader_type VARCHAR(255),
     descript VARCHAR(255),
-    update_period_id INT,
-    FOREIGN KEY (update_period_id) REFERENCES update_time (id)
 );
 
 -- inserts the predefined rows of update_time
