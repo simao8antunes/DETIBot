@@ -77,9 +77,6 @@ class MySql:
         except mysql.connector.Error as e:
             print("Error connecting to MySQL:", e)
 
-
-
-
     def insert_source(self,source):# inserts the source object 
         #insert_sql = "INSERT INTO source (url_path,loader_type,descript,update_period_id) VALUES (%s,%s,%s,%s)"
         Id = 0
@@ -136,7 +133,6 @@ class MySql:
         else:
             return "invalid index"
     
-    
     def get(self,query,arg):# implements the query, NOTA: maybe it is required more methods of this kind
         self.cursor.execute(query,arg)# maybe put here a logger and a try/ctach
         return self.cursor.fetchall()
@@ -163,7 +159,6 @@ class MySql:
         except mysql.connector.Error as e:
             print(f"Error executing query: {e}")
             return []
-
         
     def delete_url_source(self, id):
         q = "DELETE FROM url_source WHERE id = %s"
@@ -218,7 +213,21 @@ class MySql:
         except mysql.connector.Error as e:
             print(f"Error executing query: {e}")
     
-
+    def update_file_source(self, id, source: File_Source):
+        q = """
+        UPDATE file_source 
+        SET file_name = %s, file_path = %s, loader_type = %s, descript = %s 
+        WHERE id = %s
+        """        
+        try:
+            self.cursor.execute(q,(source.file_name, source.file_path, source.loader_type, source.description,id))
+            self.conn.commit()
+            if self.cursor.rowcount == 0:
+                return {"error": "ID not found"}
+            return {"message": "Source updated successfully"}
+        except mysql.connector.Error as e:
+            print(f"Error executing query: {e}")
+            return {"error": f"Error executing query: {e}"}
     
     def __exit__(self, exc_type, exc_value, traceback):
         self.conn.close()

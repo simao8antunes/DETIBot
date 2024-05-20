@@ -2,10 +2,10 @@
 #To execute the neccessary methods to index the loaded sources  
 #Into the vector store trough the 'indexer' method.
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from Services import QStore,Rag
+from Services.storing import QStore
 
 qstore = QStore()
-rag = Rag()
+#rag = Rag()
 class Indexing:
 
     def __init__(self,size=256,overlap=25):

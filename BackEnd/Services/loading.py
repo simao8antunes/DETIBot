@@ -3,18 +3,20 @@
 #'loader' method.
 #from llama_index.core import SimpleDirectoryReader
 
-from Services import URL_Source, File_Source,Indexing,QStore
+from Services.classes import URL_Source, File_Source
+from Services.indexing import Indexing
+from Services.storing import QStore
 
 from langchain_community.document_loaders.pdf import PyPDFLoader
 from langchain_community.document_loaders import Docx2txtLoader, CSVLoader, JSONLoader, UnstructuredHTMLLoader, TextLoader
 
 import os
-from Services import urlLoader,Rag
+from Services.seleniumLoader import SeleniumURLLoaderWithWait as urlLoader
 
 qstore = QStore()
 indexer = Indexing()
 PDF_PATH = "./Data"
-rag = Rag()
+#rag = Rag()
 
 class Loading:
 

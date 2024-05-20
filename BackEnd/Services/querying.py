@@ -8,14 +8,14 @@ from langchain_core.prompts import PromptTemplate
 from langchain.chains.retrieval_qa.base import RetrievalQA
 import textwrap
 
-from Services import QStore,Rag
-
+from Services.storing import QStore
 qstore = QStore()
-rag = Rag()
+
 class Query: 
 
     def __init__(self):
-        self.llm = Ollama(model="llama2", temperature=0) # ,base_url="http://ollama:11434" <- docker || local -> sem o ,base_url="http://ollama:11434"
+        self.llm = Ollama(model="llama3", temperature=0) # ,base_url="http://ollama:11434" <- docker || local -> sem o ,base_url="http://ollama:11434"
+        
 
     def queries(self, question):
         retriever, client = qstore.object_retriever()
