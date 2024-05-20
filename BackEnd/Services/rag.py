@@ -17,9 +17,9 @@ from Services.seleniumLoader import SeleniumURLLoaderWithWait
 class Rag:
     def __init__(self, path=None):
         self.token = "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"
-        self.llm = Ollama(model="llama2", temperature=0) # ,base_url="http://ollama:11434" <- docker || local -> sem o ,base_url="http://ollama:11434"
+        self.llm = Ollama(model="llama3", temperature=0) # ,base_url="http://ollama:11434" <- docker || local -> sem o ,base_url="http://ollama:11434"
         self.path = path
-        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=25)
+        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=25)
         self.embeddings = HuggingFaceEmbeddings(
         model_name="all-MiniLM-L6-v2",
         model_kwargs={'device':'cpu'}, # here we will run the model with CPU only
@@ -30,7 +30,7 @@ class Rag:
 
 
     def load_documents(self):
-        data = PyPDFLoader("./Data/info.pdf")
+        data = PyPDFLoader("./Data/calend.pdf")
         return data.load()
     
 
