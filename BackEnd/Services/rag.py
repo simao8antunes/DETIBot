@@ -29,7 +29,7 @@ class Rag:
 
 
     def load_documents(self):
-        data = PyPDFLoader("./Data/info.pdf")
+        data = PyPDFLoader("./Data/calend.pdf")
         return data.load()
     
 

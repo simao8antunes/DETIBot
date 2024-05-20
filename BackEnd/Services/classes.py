@@ -8,7 +8,7 @@ class URL_Source(BaseModel): # classe q define as fontes de conhecimento para dp
     recursive: bool = False
       
 class File_Source(BaseModel): # classe q define as fontes de conhecimento para dps serem guardadas na bd
-    url: str
+    file_name: str
+    file_path: str
     loader_type: str
-    update_period: str
     description: str

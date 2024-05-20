@@ -4,8 +4,56 @@
 #This classes provide the necessary methods to Insert, Delete or modify data in Qdrant and H2.
 
 from Services import File_Source, URL_Source
+from qdrant_client import QdrantClient
+from qdrant_client.models import Filter, FieldCondition,MatchValue, models
+from langchain_community.vectorstores.qdrant import Qdrant
+from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from datetime import datetime, timedelta
 import mysql.connector
+
+QDRANT_URL = "http://localhost:6333" #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
+MYSQL_HOST = "localhost" #"mysqldb" <-docker || local -> "localhost"
+
+class QStore:  
+
+    def __init__(self):
+        self.embeddings = HuggingFaceEmbeddings(
+        model_name="all-MiniLM-L6-v2",
+        model_kwargs={'device':'cpu'}, # here we will run the model with CPU only
+        encode_kwargs = {
+            'normalize_embeddings': True # keep True to compute cosine similarity
+        })
+    
+    def index_documents(self, chunks):
+        
+        index = Qdrant.from_documents(
+            chunks,
+            embedding=self.embeddings,
+            url=QDRANT_URL,  
+            collection_name="db"
+        )
+        index.client.close()
+
+    def object_retriever(self):
+        client = QdrantClient(url=QDRANT_URL)
+        self.vector_store = Qdrant(client=client,embeddings=self.embeddings,collection_name="db")
+        retriever = self.vector_store.as_retriever()
+        return retriever, client
+    
+    def delete_vectors(self, payload_source="./Data/info.pdf"):
+        client = QdrantClient(url=QDRANT_URL)
+        if client.collection_exists(collection_name="db"):
+            delete_filter=Filter(
+                must=[
+                    FieldCondition(
+                        key="metadata.source",
+                        match=MatchValue(value=payload_source),
+                        )
+                    ]
+                )
+            
+            client.delete(collection_name="db", points_selector=delete_filter)
+        client.close()
 
 class MySql:
     
@@ -14,7 +62,7 @@ class MySql:
         # Connect to MySQL
         try:
             self.conn = mysql.connector.connect(
-                host="localhost", #host="mysqldb" <-docker || local -> host="localhost"
+                host=MYSQL_HOST,
                 user="bot",
                 password="pi2024",
                 database="Detibot"
@@ -45,10 +93,10 @@ class MySql:
         if isinstance(source, File_Source): 
             insert_sql = (
                 "INSERT INTO file_source "
-                "(url_path, loader_type, descript, update_period_id) "
+                "(file_name,file_path, loader_type, descript) "
                 "VALUES (%s, %s, %s, %s)"
             )
-            params = (source.url, source.loader_type, source.description, Id)
+            params = (source.file_name,source.file_path, source.loader_type, source.description)
         elif isinstance(source, URL_Source):
             insert_sql = (
                 "INSERT INTO url_source "
@@ -58,8 +106,6 @@ class MySql:
             params = (source.url, ','.join(source.paths), source.description, source.wait_time, source.recursive, Id)
         else:
             return "Invalid source type"
-        
-
 
         try:
             self.cursor.execute(insert_sql,params) # maybe put here a logger and a try/ctach
