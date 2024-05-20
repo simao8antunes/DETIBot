@@ -199,21 +199,23 @@ const MyForm = () => {
               />
             </Form.Group>
 
-            <Form.Group controlId="frequency">
-              <Form.Label>Frequency of Updates:</Form.Label>
-              <Form.Control
-                as="select"
-                value={frequency}
-                onChange={handleFrequencyChange}
-                style={{ borderRadius: '10px', color: '#1e90ff' }}
-              >
-                <option value="">Select Frequency</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="quarterly">Quarterly</option>
-              </Form.Control>
-            </Form.Group>
+            {sourceType !== 'file' && (
+              <Form.Group controlId="frequency">
+                <Form.Label>Frequency of Updates:</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={frequency}
+                  onChange={handleFrequencyChange}
+                  style={{ borderRadius: '10px', color: '#1e90ff' }}
+                >
+                  <option value="">Select Frequency</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="quarterly">Quarterly</option>
+                </Form.Control>
+              </Form.Group>
+            )}
 
             <br />
 
