@@ -29,43 +29,43 @@ class Loading:
     def file_loader(self, source: File_Source):
         qstore.delete_vectors(source.file_path)
         if source.loader_type == "pdf":
-            documents = self.load_pdf()
+            documents = self.load_pdf(source)
         elif source.loader_type == "csv":
-            documents = self.load_csv()
+            documents = self.load_csv(source)
         elif source.loader_type == "docx":
-            documents = self.load_docx()
+            documents = self.load_docx(source)
         elif source.loader_type == "json":
-            documents = self.load_csv()
+            documents = self.load_csv(source)
         elif source.loader_type == "html":
-            documents = self.load_json()
+            documents = self.load_json(source)
         else:
-            documents = self.load_text()
+            documents = self.load_text(source)
         indexer.index(documents)
         return {"Loading": "Successfull"}
     
     def load_csv(self, source):
-        loader = CSVLoader(file_path=source.url)
+        loader = CSVLoader(file_path=source.file_path)
         return loader.load()
     
     def load_docx(self, source):
         #%pip install --upgrade --quiet  docx2txt
-        loader = Docx2txtLoader(file_path=source.url)
+        loader = Docx2txtLoader(file_path=source.file_path)
         return loader.load()
     
     def load_json(self, source):
-        loader = JSONLoader(file_path=source.url)##ver documentaçao para ver se é assim
+        loader = JSONLoader(file_path=source.file_path)##ver documentaçao para ver se é assim
         return loader.load()
     
     def load_html(self, source):
-        loader = UnstructuredHTMLLoader(file_path=source.url)
+        loader = UnstructuredHTMLLoader(file_path=source.file_path)
         return loader.load()
     
     def load_text(self, source):
-        loader = TextLoader(file_path=source.url)
+        loader = TextLoader(file_path=source.file_path)
         return loader.load()
     
     def load_pdf(self, source):
-        loader = PyPDFLoader(file_path=source.url)
+        loader = PyPDFLoader(file_path=source.file_path)
         return loader.load()
     
     def load_urls(self, source:URL_Source):

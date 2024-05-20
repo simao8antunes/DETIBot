@@ -11,7 +11,7 @@ procurador = Query()
 load = Loading()
 db = MySql()
 qstore = QStore()
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = "./uploads"
 
 app.add_middleware(
     CORSMiddleware,
@@ -46,8 +46,9 @@ async def SourceFile(file: UploadFile = File(...), descript: str = Form(...)):
     file_location = os.path.join(UPLOAD_FOLDER, file.filename)
     with open(file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-
-    source = File_Source(file.filename,file_location,file.content_type,descript)
+    
+    print(file.content_type)
+    source = File_Source(file_name=file.filename,file_path=file_location,loader_type=file.content_type,description=descript)
     #inserts the source object into the db
     db.insert_source(source)
     #loads the new source object
@@ -56,6 +57,7 @@ async def SourceFile(file: UploadFile = File(...), descript: str = Form(...)):
 
 @app.post("/detibot/insert_urlsource")
 async def SourceUrl(source: URL_Source):
+    print(source)
     #inserts the source object into the db
     db.insert_source(source)
     #loads the new source object

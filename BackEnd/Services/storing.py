@@ -78,18 +78,7 @@ class MySql:
             print("Error connecting to MySQL:", e)
 
     def insert_source(self,source):# inserts the source object 
-        #insert_sql = "INSERT INTO source (url_path,loader_type,descript,update_period_id) VALUES (%s,%s,%s,%s)"
-        Id = 0
-        if source.update_period == "Daily":
-            Id = 1
-        elif source.update_period == 'Weekly':
-            Id = 2
-        elif source.update_period == 'Monthly':
-            Id = 3
-        elif source.update_period == 'Quarter':
-            Id = 4
-        
-        
+        #insert_sql = "INSERT INTO source (url_path,loader_type,descript,update_period_id) VALUES (%s,%s,%s,%s)"        
         if isinstance(source, File_Source): 
             insert_sql = (
                 "INSERT INTO file_source "
@@ -98,6 +87,15 @@ class MySql:
             )
             params = (source.file_name,source.file_path, source.loader_type, source.description)
         elif isinstance(source, URL_Source):
+            Id = 0
+            if source.update_period == "Daily":
+                Id = 1
+            elif source.update_period == 'Weekly':
+                Id = 2
+            elif source.update_period == 'Monthly':
+                Id = 3
+            elif source.update_period == 'Quarter':
+                Id = 4
             insert_sql = (
                 "INSERT INTO url_source "
                 "(url_link, paths, descript, wait_time, recursive_url, update_period_id) "

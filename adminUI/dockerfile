@@ -7,14 +7,9 @@ COPY /src /root/src
 
 WORKDIR /root
 
-# Install dependencies
 RUN npm install
-
-# Build the React app
+RUN npm install react-bootstrap
 RUN npm run build
-
-# Expose port 3010
 EXPOSE 3010
 
-# Command to run the React app
 CMD ["npm", "start"]

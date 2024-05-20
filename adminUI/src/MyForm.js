@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Form, Button, Card, Row, Col, Tabs, Tab } from 'react-bootstrap';
 import axios from 'axios';
 
+const API_ADDR = "localhost:8000";
+
 const MyForm = () => {
   const [sourceType, setSourceType] = useState('file');
   const [file, setFile] = useState(null); // Using null instead of empty string for file
@@ -61,7 +63,7 @@ const MyForm = () => {
     if (sourceType === 'file') {
       apiUrl = 'http://localhost:8000/detibot/insert_filesource';
       data.append('file', file);
-      data.append('description', description);
+      data.append('descript', description);
     } else if (sourceType === 'url') {
       apiUrl = 'http://localhost:8000/detibot/insert_urlsource';
       data = {
@@ -194,10 +196,10 @@ const MyForm = () => {
                     style={{ borderRadius: '10px', color: '#1e90ff' }}
                   >
                     <option value="">Select Frequency</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="quarterly">Quarterly</option>
+                    <option value="Daily">Daily</option>
+                    <option value="Weekly">Weekly</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Quarterly">Quarterly</option>
                   </Form.Control>
                 </Form.Group>
                 <br />
