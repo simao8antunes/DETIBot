@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Form, Button, Card, Row, Col, Tabs, Tab } from 'react-bootstrap';
+import { Form, Button, Card, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
 const MyForm = () => {
-  const [sourceType, setSourceType] = useState('file');
+  const [sourceType, setSourceType] = useState('');
   const [file, setFile] = useState(null); // Using null instead of empty string for file
   const [url, setUrl] = useState('');
   const [description, setDescription] = useState('');
@@ -11,6 +11,17 @@ const MyForm = () => {
   const [recursive, setRecursive] = useState(false);
   const [pathsEnabled, setPathsEnabled] = useState(false);
   const [paths, setPaths] = useState([]);
+
+  const handleSourceTypeChange = (event) => {
+    setSourceType(event.target.value);
+    // Reset paths and other related state when changing source type
+    setPathsEnabled(false);
+    setPaths([]);
+    setRecursive(false);
+    // Reset file and url inputs
+    setFile(null);
+    setUrl('');
+  };
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]); // Set the file object directly
@@ -54,7 +65,7 @@ const MyForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    
     let apiUrl = '';
     let data = new FormData();
 
@@ -92,50 +103,50 @@ const MyForm = () => {
       <h2 className="text-center mb-4" style={{ fontFamily: 'Poppins, sans-serif', color: '#666', fontWeight: 'lighter', letterSpacing: '1px', lineHeight: '1.5', borderRadius: '10px', fontSize: '28px' }}>Loader</h2>
       <Card className="shadow p-3 mb-5 bg-white rounded" style={{ borderRadius: '30px', padding: '20px', maxWidth: '600px', width: 'auto', margin: '20px auto', border: '2px solid #1e90ff' }}>
         <Card.Body>
-          <Tabs
-            id="source-type-tabs"
-            activeKey={sourceType}
-            onSelect={(key) => setSourceType(key)}
-            className="mb-3"
-          >
-            <Tab eventKey="file" title="File">
-              <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="fileUpload">
-                  <Form.Label>Upload File:</Form.Label>
-                  <Form.Control
-                    type="file"
-                    onChange={handleFileChange}
-                    style={{ color: '#1e90ff' }}
-                  />
-                </Form.Group>
-                <Form.Group controlId="description">
-                  <Form.Label>Description:</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    value={description}
-                    onChange={handleDescriptionChange}
-                    style={{ borderRadius: '10px', color: '#1e90ff' }}
-                  />
-                </Form.Group>
-                <br />
-                <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }}>
-                  Submit
-                </Button>
-              </Form>
-            </Tab>
-            <Tab eventKey="url" title="URL">
-              <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="urlInput">
-                  <Form.Label>URL:</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter URL"
-                    value={url}
-                    onChange={handleUrlChange}
-                    style={{ color: '#1e90ff' }}
-                  />
-                </Form.Group>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group controlId="sourceType">
+              <Form.Label>Type of Source:</Form.Label>
+              <div>
+                <Form.Check
+                  type="radio"
+                  label="File"
+                  value="file"
+                  checked={sourceType === 'file'}
+                  onChange={handleSourceTypeChange}
+                  style={{ marginLeft: '10px', color: '#1e90ff' }}
+                />
+                <Form.Check
+                  type="radio"
+                  label="URL"
+                  value="url"
+                  checked={sourceType === 'url'}
+                  onChange={handleSourceTypeChange}
+                  style={{ marginLeft: '10px', color: '#1e90ff' }}
+                />
+              </div>
+            </Form.Group>
+
+            <Form.Group controlId="sourceValue">
+              <Form.Label>{sourceType === 'file' ? 'Upload File:' : 'URL:'}</Form.Label>
+              {sourceType === 'file' ? (
+                <Form.Control
+                  type="file"
+                  onChange={handleFileChange}
+                  style={{ color: '#1e90ff' }}
+                />
+              ) : (
+                <Form.Control
+                  type="text"
+                  placeholder={sourceType === 'file' ? 'Choose file' : 'Enter URL'}
+                  value={url}
+                  onChange={handleUrlChange}
+                  style={{ color: '#1e90ff' }}
+                />
+              )}
+            </Form.Group>
+
+            {sourceType === 'url' && (
+              <>
                 <Form.Group controlId="recursive">
                   <Form.Check
                     type="checkbox"
@@ -175,38 +186,44 @@ const MyForm = () => {
                     <Button variant="primary" onClick={handleAddPath}>Add Path</Button>
                   </>
                 )}
-                <Form.Group controlId="description">
-                  <Form.Label>Description:</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    value={description}
-                    onChange={handleDescriptionChange}
-                    style={{ borderRadius: '10px', color: '#1e90ff' }}
-                  />
-                </Form.Group>
-                <Form.Group controlId="frequency">
-                  <Form.Label>Frequency of Updates:</Form.Label>
-                  <Form.Control
-                    as="select"
-                    value={frequency}
-                    onChange={handleFrequencyChange}
-                    style={{ borderRadius: '10px', color: '#1e90ff' }}
-                  >
-                    <option value="">Select Frequency</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="quarterly">Quarterly</option>
-                  </Form.Control>
-                </Form.Group>
-                <br />
-                <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }}>
-                  Submit
-                </Button>
-              </Form>
-            </Tab>
-          </Tabs>
+              </>
+            )}
+
+            <Form.Group controlId="description">
+              <Form.Label>Description:</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={description}
+                onChange={handleDescriptionChange}
+                style={{ borderRadius: '10px', color: '#1e90ff' }}
+              />
+            </Form.Group>
+
+            {sourceType !== 'file' && (
+              <Form.Group controlId="frequency">
+                <Form.Label>Frequency of Updates:</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={frequency}
+                  onChange={handleFrequencyChange}
+                  style={{ borderRadius: '10px', color: '#1e90ff' }}
+                >
+                  <option value="">Select Frequency</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="quarterly">Quarterly</option>
+                </Form.Control>
+              </Form.Group>
+            )}
+
+            <br />
+
+            <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }}>
+              Submit
+            </Button>
+          </Form>
         </Card.Body>
       </Card>
     </>
