@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { DropdownButton, Dropdown } from 'react-bootstrap';
 import '../ChatPage.css';
 
 const API_ADDR = "localhost:8000";
@@ -7,6 +8,7 @@ const API_ADDR = "localhost:8000";
 const ChatPage = () => {
     const [messages, setMessages] = useState([]); // State for storing chat messages
     const [newMessage, setNewMessage] = useState(''); // State for the current input
+    const [language, setLanguage] = useState('en'); // State for the selected language
 
     // Function to handle sending a new message
     const handleSendMessage = async () => {
@@ -27,7 +29,6 @@ const ChatPage = () => {
             try {
                 const url = `http://${API_ADDR}/detibot/${encodeURIComponent(newMessage)}`;
                 const response = await axios.get(url);
-                console.log(response)
 
                 // Handle the API response
                 if (response.data) {
@@ -36,7 +37,6 @@ const ChatPage = () => {
                         isUser: false, // Indicates the message is from the API
                     };
                     // Add the API response to the list of messages
-                    
                     setMessages((prevMessages) => [...prevMessages, apiResponse]);
                 }
             } catch (error) {
@@ -54,37 +54,86 @@ const ChatPage = () => {
         }
     };
 
+    // Function to handle language change
+    const handleLanguageChange = (selectedLanguage) => {
+        setLanguage(selectedLanguage);
+    };
+
+    // Function to translate text based on the selected language
+    const translateText = (text) => {
+        // Define translations for English and Portuguese (Portugal)
+        const translations = {
+            en: {
+                chatPageTitle: 'DetiBot',
+                sendButton: 'Send',
+                placeholder: 'Type your message...',
+            },
+            pt: {
+                chatPageTitle: 'DetiBot',
+                sendButton: 'Enviar',
+                placeholder: 'Escreva a sua mensagem...',
+            },
+        };
+
+        // Return the translated text based on the selected language
+        return translations[language][text];
+    };
+
     return (
         <div className="container mt-4">
-            <h1 className="mb-4">Chat Page</h1>
 
-            {/* Display chat messages */}
-            <div className="chat-container" style={{ maxHeight: '300px', overflowY: 'auto', borderRadius: '15px', border: '1px solid #ccc', padding: '10px' }}>
-                {messages.map((message, index) => (
-                    <div key={index} className={`message-wrapper ${message.isUser ? 'user-message' : 'api-message'}`}>
-                        <div className={`message-bubble ${message.isUser ? 'user-bubble' : 'api-bubble'}`}>
-                            {message.text}
+            {/* Language dropdown button */}
+            <DropdownButton
+                id="languageDropdown"
+                title={language === 'en' ? 'English' : 'Português'}
+                variant="primary"
+                style={{ position: 'absolute', top: '20px', right: '20px', backgroundColor: '#007bff', borderColor: '#007bff', borderRadius: '25px' }}
+            >
+                <Dropdown.Item onClick={() => handleLanguageChange('en')}>English</Dropdown.Item>
+                <Dropdown.Item onClick={() => handleLanguageChange('pt')}>Português</Dropdown.Item>
+            </DropdownButton>
+
+            <h1 className="mb-4" style={{ fontFamily: 'Poppins, sans-serif', color: '#666', fontWeight: 'lighter' }}>{translateText('chatPageTitle')}</h1>
+
+            <div className="card shadow" style={{ borderRadius: '25px', backgroundColor: '#A1C0CC', border: 'none' }}>
+
+                <div className="card-body">
+                    
+
+                    {/* Display chat messages */}
+                    <div className="chat-container" style={{backgroundColor: '#FFFFFF', maxHeight: '700px', overflowY: 'auto', height: '600px' }}>
+                        {messages.map((message, index) => (
+                            <div key={index} className={`message-wrapper ${message.isUser ? 'user-message' : 'api-message'}`}>
+                                <div className={`message-bubble ${message.isUser ? 'user-bubble' : 'api-bubble'}`}>
+                                    {message.text}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Chat input field and send button */}
+                    <div className="input-group mt-3">
+                        <input
+                            type="text"
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder={translateText('placeholder')}
+                            className="form-control"
+                            style={{ borderRadius: '15px 15px 15px 15px' }}
+                        />
+                        <div className="input-group-append" style={{ marginLeft: '10px' }}>
+                            <button
+                                onClick={handleSendMessage}
+                                className="btn btn-primary"
+                                type="button"
+                                style={{ backgroundColor: '#007bff', borderColor: '#007bff', borderRadius: '25px' }}
+                            >
+                                {translateText('sendButton')}
+                            </button>
                         </div>
                     </div>
-                ))}
-            </div>
-
-            {/* Chat input field */}
-            <div className="input-group mt-3">
-                <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Type your message..."
-                    className="form-control"
-                />
-                <button
-                    onClick={handleSendMessage}
-                    className="btn btn-primary ml-2"
-                >
-                    Send
-                </button>
+                </div>
             </div>
         </div>
     );
