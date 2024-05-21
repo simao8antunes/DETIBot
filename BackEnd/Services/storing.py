@@ -17,12 +17,13 @@ MYSQL_HOST = "localhost" #"mysqldb" <-docker || local -> "localhost"
 class QStore:  
 
     def __init__(self):
-        self.embeddings = HuggingFaceEmbeddings(
-        model_name="all-MiniLM-L6-v2",
-        model_kwargs={'device':'cpu'}, # here we will run the model with CPU only
-        encode_kwargs = {
-            'normalize_embeddings': True # keep True to compute cosine similarity
-        })
+       self.embeddings = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+            model_kwargs={'device':'cpu'},
+            encode_kwargs = {
+                'normalize_embeddings': True # keep True to compute cosine similarity
+            }
+        )
     
     def index_documents(self, chunks):
         
