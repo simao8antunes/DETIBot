@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Form, Button, Card, Row, Col, Tabs, Tab, Spinner } from 'react-bootstrap';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
-const API_ADDR = "localhost:8000";
 
 const MyForm = () => {
   const [sourceType, setSourceType] = useState('file');
@@ -14,6 +15,9 @@ const MyForm = () => {
   const [pathsEnabled, setPathsEnabled] = useState(false);
   const [paths, setPaths] = useState([]);
   const [loading, setLoading] = useState(false); // Loading state
+  const [success, setSuccess] = useState(false); // Success state
+  const [questions, setQuestions] = useState(''); // State for questions
+  const [answers, setAnswers] = useState(''); // State for answers
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]); // Set the file object directly
@@ -55,9 +59,18 @@ const MyForm = () => {
     setPaths(newPaths);
   };
 
+  const handleQuestionsChange = (event) => {
+    setQuestions(event.target.value);
+  };
+
+  const handleAnswersChange = (event) => {
+    setAnswers(event.target.value);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true); // Set loading to true on submit
+    setSuccess(false); // Reset success state
 
     let apiUrl = '';
     let data = new FormData();
@@ -77,6 +90,12 @@ const MyForm = () => {
         wait_time: 3,
         recursive: recursive
       };
+    } else if (sourceType === 'qa') {
+      apiUrl = 'http://localhost:8000/detibot/insert_qasource';
+      data = {
+        questions: questions,
+        answers: answers
+      };
     }
 
     try {
@@ -87,6 +106,7 @@ const MyForm = () => {
       });
       console.log('API response:', response.data);
       setLoading(false); // Set loading to false after response
+      setSuccess(true); // Set success to true
       setFile(null); // Using null instead of empty string for file
       setUrl('');
       setDescription('');
@@ -94,9 +114,12 @@ const MyForm = () => {
       setRecursive(false);
       setPathsEnabled(false);
       setPaths([]);
+      setQuestions(''); // Reset questions
+      setAnswers(''); // Reset answers
     } catch (error) {
       console.error('Error:', error);
       setLoading(false); // Set loading to false if there's an error
+      setSuccess(false); // Reset success state in case of error
     }
   };
 
@@ -134,6 +157,7 @@ const MyForm = () => {
                 <br />
                 <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }} disabled={loading}>
                   {loading ? <Spinner animation="border" size="sm" /> : 'Submit'}
+                  {success && <span className="text-success ml-2"><FontAwesomeIcon icon={faCheck} /> Success</span>}
                 </Button>
               </Form>
             </Tab>
@@ -216,6 +240,36 @@ const MyForm = () => {
                 <br />
                 <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }} disabled={loading}>
                   {loading ? <Spinner animation="border" size="sm" /> : 'Submit'}
+                  {success && <span className="text-success ml-2"><FontAwesomeIcon icon={faCheck} /> Success</span>}
+                </Button>
+              </Form>
+            </Tab>
+            <Tab eventKey="qa" title="Q&A">
+              <Form onSubmit={handleSubmit}>
+                <Form.Group controlId="questions">
+                  <Form.Label>Questions:</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    value={questions}
+                    onChange={handleQuestionsChange}
+                    style={{ borderRadius: '10px', color: '#1e90ff' }}
+                  />
+                </Form.Group>
+                <Form.Group controlId="answers">
+                  <Form.Label>Answers:</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    value={answers}
+                    onChange={handleAnswersChange}
+                    style={{ borderRadius: '10px', color: '#1e90ff' }}
+                  />
+                </Form.Group>
+                <br />
+                <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }} disabled={loading}>
+                  {loading ? <Spinner animation="border" size="sm" /> : 'Submit'}
+                  {success && <span className="text-success ml-2"><FontAwesomeIcon icon={faCheck} /> Success</span>}
                 </Button>
               </Form>
             </Tab>
