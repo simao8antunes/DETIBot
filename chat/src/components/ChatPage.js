@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { DropdownButton, Dropdown } from 'react-bootstrap';
 import '../ChatPage.css';
+import userAvatar from '../assets/user-avatar.jpg'; // Placeholder user avatar
+import botAvatar from '../assets/bot-avatar.jpg'; // Bot avatar
 
 const API_ADDR = "localhost:8000";
 
@@ -104,6 +106,12 @@ const ChatPage = () => {
                     <div className="chat-container" style={{backgroundColor: '#FFFFFF', maxHeight: '700px', overflowY: 'auto', height: '600px' }}>
                         {messages.map((message, index) => (
                             <div key={index} className={`message-wrapper ${message.isUser ? 'user-message' : 'api-message'}`}>
+                                <img 
+                                    src={message.isUser ? userAvatar : botAvatar} 
+                                    alt={message.isUser ? 'User' : 'Bot'} 
+                                    className="avatar" 
+                                    style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }}
+                                />
                                 <div className={`message-bubble ${message.isUser ? 'user-bubble' : 'api-bubble'}`}>
                                     {message.text}
                                 </div>

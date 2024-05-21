@@ -10,15 +10,23 @@
 
 .message-wrapper {
     display: flex;
+    align-items: center;
     margin-bottom: 8px;
 }
 
 .user-message {
-    justify-content: flex-end;
+    flex-direction: row-reverse; /* Position the user's avatar to the right */
 }
 
 .api-message {
-    justify-content: flex-start;
+    flex-direction: row; /* Position the bot's avatar to the left */
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin: 0 10px; /* Margin around the avatars */
 }
 
 .message-bubble {

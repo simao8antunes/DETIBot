@@ -3,31 +3,76 @@
 #'loader' method.
 #from llama_index.core import SimpleDirectoryReader
 
-from Services.classes import Source
-
-
+from Services.classes import URL_Source, File_Source
 from Services.indexing import Indexing
-from langchain_community.vectorstores.qdrant import Qdrant
-from langchain_community.embeddings.huggingface import HuggingFaceInferenceAPIEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders.pdf import PyPDFLoader
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-import os
-from Services.rag import Rag
+from Services.storing import QStore
 
+from langchain_community.document_loaders.pdf import PyPDFLoader
+from langchain_community.document_loaders import Docx2txtLoader, CSVLoader, JSONLoader, UnstructuredHTMLLoader, TextLoader
+
+import os
+from Services.seleniumLoader import SeleniumURLLoaderWithWait as urlLoader
+
+qstore = QStore()
 indexer = Indexing()
 PDF_PATH = "./Data"
-rag = Rag()
+#rag = Rag()
 
 class Loading:
 
-    def loader(self, source: Source):
-        if source.loader_type == 'url': 
-            documents=rag.load_urls(source)
-        if source.loader_type == 'pdf': 
-            documents = rag.load_documents()
-        print(documents)
+    def url_loader(self, source: URL_Source):
+        qstore.delete_vectors(source.url)
+        documents=self.load_urls(source)
         indexer.index(documents)
         return {"Loading": "Successfull"}
+    
+    def file_loader(self, source: File_Source):
+        qstore.delete_vectors(source.file_path)
+        if source.loader_type == "application/pdf":
+            documents = self.load_pdf(source)
+        elif source.loader_type == "application/csv":
+            documents = self.load_csv(source)
+        elif source.loader_type == "application/docx":
+            documents = self.load_docx(source)
+        elif source.loader_type == "application/json":
+            documents = self.load_csv(source)
+        elif source.loader_type == "application/html":
+            documents = self.load_json(source)
+        else:
+            documents = self.load_text(source)
+        indexer.index(documents)
+        return {"Loading": "Successfull"}
+    
+    def load_csv(self, source):
+        loader = CSVLoader(file_path=source.file_path)
+        return loader.load()
+    
+    def load_docx(self, source):
+        #%pip install --upgrade --quiet  docx2txt
+        loader = Docx2txtLoader(file_path=source.file_path)
+        return loader.load()
+    
+    def load_json(self, source):
+        loader = JSONLoader(file_path=source.file_path)##ver documentaçao para ver se é assim
+        return loader.load()
+    
+    def load_html(self, source):
+        loader = UnstructuredHTMLLoader(file_path=source.file_path)
+        return loader.load()
+    
+    def load_text(self, source):
+        loader = TextLoader(file_path=source.file_path)
+        return loader.load()
+    
+    def load_pdf(self, source):
+        loader = PyPDFLoader(file_path=source.file_path)
+        return loader.load()
+    
+    def load_urls(self, source:URL_Source):
+        loader = urlLoader(urls=[source.url], browser="chrome", headless=True)
+        return loader.load(wait_time=source.wait_time, recursive=source.recursive, paths=source.paths)
+
+    
+
 
 

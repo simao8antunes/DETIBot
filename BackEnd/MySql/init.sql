@@ -1,23 +1,31 @@
 USE Detibot;
 
--- Creats update_time table
+-- Creates update_time table
 CREATE TABLE IF NOT EXISTS update_time (
     id INT PRIMARY KEY,
     period_date VARCHAR(20),
     update_period VARCHAR(30)
 );
 
--- Creats source table
-CREATE TABLE IF NOT EXISTS source (
+-- Creates source table
+CREATE TABLE IF NOT EXISTS url_source (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    url_path VARCHAR(255),
-    link_paths VARCHAR(255),
-    loader_type VARCHAR(255),
+    url_link VARCHAR(255),
+    paths VARCHAR(255),
     descript VARCHAR(255),
     wait_time INT,
-    recursive_url boolean,
+    recursive_url BOOLEAN,
     update_period_id INT,
     FOREIGN KEY (update_period_id) REFERENCES update_time (id)
+);
+
+-- Creates source table
+CREATE TABLE IF NOT EXISTS file_source (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    file_name VARCHAR(255),
+    file_path VARCHAR(255),
+    loader_type VARCHAR(255),
+    descript VARCHAR(255)
 );
 
 -- inserts the predefined rows of update_time
