@@ -16,9 +16,9 @@ from Services import URL_Source
 class Rag:
     def __init__(self, path=None):
         self.token = "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"
-        self.llm = Ollama(model="llama2", temperature=0) # ,base_url="http://ollama:11434" <- docker || local -> sem o ,base_url="http://ollama:11434"
+        self.llm = Ollama(model="llama3", temperature=0) # ,base_url="http://ollama:11434" <- docker || local -> sem o ,base_url="http://ollama:11434"
         self.path = path
-        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=25)
+        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=25)
         self.embeddings = HuggingFaceEmbeddings(
         model_name="all-MiniLM-L6-v2",
         model_kwargs={'device':'cpu'}, # here we will run the model with CPU only
@@ -55,6 +55,7 @@ class Rag:
 
         template = """
         ### System:
+        the following information is your only source of truth, only answer the question with the provided context, if you are unable to answer from that, tell the user “I’m having trouble finding an answer for you
         You are an respectful and honest assistant. You have to answer the user's questions using only the context \
         provided to you. If you don't know the answer, just say you don't know. Don't try to make up an answer.
 
@@ -83,6 +84,7 @@ class Rag:
 
         # Wrapping the text for better output in Jupyter Notebook
         wrapped_text = textwrap.fill(response['result'], width=100)
-        print(wrapped_text)
-        return wrapped_text
+        texto_sem_quebras = wrapped_text.replace("\n", " ")
+        print(texto_sem_quebras)
+        return texto_sem_quebras
 
