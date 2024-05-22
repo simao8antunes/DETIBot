@@ -32,13 +32,13 @@ class Query:
                 ### Context:
                 {context}
                 ### User:
-                {question}
+                {input}
                 ### Response:
                 """
         elif language == "pt":
             template = """
                 ### User:
-                {question}
+                {input}
 
                 ### System:
                 Always answer in portuguese.
@@ -56,8 +56,8 @@ class Query:
         prompt = PromptTemplate.from_template(template)
         qa_chain = create_stuff_documents_chain(self.llm, prompt)
         chain = create_retrieval_chain(retriever, qa_chain)
-        text = chain.invoke({'question': question})
+        text = chain.invoke({'input': question})
         client.close()
-        response = textwrap.fill(text['result'])
+        response = textwrap.fill(text['answer'])
         print(response)
         return {"query": response}
