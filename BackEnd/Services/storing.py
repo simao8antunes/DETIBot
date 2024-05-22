@@ -10,6 +10,8 @@ from langchain_community.vectorstores.qdrant import Qdrant
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from datetime import datetime, timedelta
 import mysql.connector
+from langchain_community.docstore.base import Document
+
 
 QDRANT_URL = "http://localhost:6333" #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
 MYSQL_HOST = "localhost" #"mysqldb" <-docker || local -> "localhost"
@@ -27,7 +29,7 @@ class QStore:
        
 
     def index_faq(self, source:Faq_Source):
-        chunks = {"text": f"Pergunta: {source.question}\nResposta: {source.answer}"}
+        chunks = [Document(page_content=f"Pergunta: {source.question}\nResposta: {source.answer}")]
         index = Qdrant.from_documents(
             chunks,
             embedding=self.embeddings,

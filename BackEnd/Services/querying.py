@@ -21,6 +21,7 @@ class Query:
         retriever, client = qstore.object_retriever()
         template = """
         ### System:
+        The following information is your only source of truth, only answer the question with the provided context, if you are unable to answer from that, tell the user “I’m having trouble finding an answer for you
         You are an respectful and honest assistant. You have to answer the user's questions using only the context \
         provided to you. If you don't know the answer, just say you don't know. Don't try to make up an answer.
         ### Context:
