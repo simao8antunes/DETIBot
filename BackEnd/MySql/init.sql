@@ -28,6 +28,12 @@ CREATE TABLE IF NOT EXISTS file_source (
     descript VARCHAR(255)
 );
 
+CREATE TABLE IF NOT EXISTS faq_source (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    question VARCHAR(255),
+    answer VARCHAR(255),
+);
+
 -- inserts the predefined rows of update_time
 INSERT INTO update_time (id,period_date, update_period) VALUES (1,'Daily', '2024-03-22 00:00:00');
 INSERT INTO update_time (id,period_date, update_period) VALUES (2,'Weekly', '2024-03-22 00:00:00');

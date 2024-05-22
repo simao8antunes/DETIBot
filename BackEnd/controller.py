@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 import shutil
 
-from Services import Query,Loading,MySql,URL_Source,File_Source,QStore
+from Services import Query,Loading,MySql,URL_Source,File_Source,QStore,Faq_Source
 
 
 app = FastAPI()
@@ -56,11 +56,18 @@ async def SourceFile(file: UploadFile = File(...), descript: str = Form(...)):
 
 @app.post("/detibot/insert_urlsource")
 async def SourceUrl(source: URL_Source):
-    print(source)
     #inserts the source object into the db
     db.insert_source(source)
     #loads the new source object
     load.url_loader(source)
+
+@app.post("/detibot/insert_faqsource")
+async def SourceUrl(source: Faq_Source):
+    print(source)
+    #inserts the source object into the db
+    db.insert_source(source)
+    #loads the new source object
+    qstore.index_faq(source)
 
 @app.delete("/detibot/delete_urlsource/{id}")
 async def deleteUrlSource(id: int):
