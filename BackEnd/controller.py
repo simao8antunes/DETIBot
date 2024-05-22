@@ -77,10 +77,12 @@ async def SourceUrl(source: URL_Source):
 async def SourceUrl(source: Faq_Source):
     print(source)
     #inserts the source object into the db
+    qstore.delete_vectors(source.question)
     db.insert_source(source)
     #loads the new source object
     qstore.index_faq(source)
 
+#------------------------ endpoints to delete sources in the system------------------------------
 @app.delete("/detibot/delete_urlsource/{id}")
 async def deleteUrlSource(id: int):
     current_source = db.get("SELECT file_path FROM file_source WHERE id = %s",[id])
@@ -89,11 +91,18 @@ async def deleteUrlSource(id: int):
 
 @app.delete("/detibot/delete_filesource/{id}")
 async def deleteFileSource(id: int):
-    current_source = db.get("SELECT url_link FROM url_source WHERE id = %s",[id])
+    current_source = db.get("SELECT file_path FROM url_source WHERE id = %s",[id])
     qstore.delete_vectors(current_source[0])
     db.delete_file_source(id)
+    #falta dar delete na pasta do uploads
 
+@app.delete("/detibot/delete_faqsource/{id}")
+async def deleteFileSource(id: int):
+    current_source = db.get("SELECT question FROM faq_source WHERE id = %s",[id])
+    qstore.delete_vectors(current_source[0])
+    db.delete_faq_source(id)
 
+#------------------------ endpoints to update sources in the system------------------------------
 @app.put("/detibot/update_urlsource/{id}")
 async def updateUrlSource(id: int,source: URL_Source):
     db.update_url_source(id, source)
@@ -118,3 +127,9 @@ async def updateFileSource(id: int,file: UploadFile = File(...), descript: str =
     updated_source = File_Source(file_name=file.filename,file_path=file_location,loader_type=file.content_type,description=descript)
     db.update_file_source(id, updated_source)
     load.file_loader(updated_source)
+
+@app.put("/detibot/update_faqsource/{id}")
+async def updateUrlSource(id: int,source: Faq_Source):
+    db.update_faq_source(id, source)
+    qstore.delete_vectors(source.question)
+    qstore.index_faq(source)

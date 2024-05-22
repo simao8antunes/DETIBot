@@ -29,7 +29,7 @@ class QStore:
        
 
     def index_faq(self, source:Faq_Source):
-        chunks = [Document(page_content=f"Pergunta: {source.question}\nResposta: {source.answer}")]
+        chunks = [Document(page_content=f"Pergunta: {source.question}\nResposta: {source.answer}",metadata={"source": {source.question}})]
         index = Qdrant.from_documents(
             chunks,
             embedding=self.embeddings,
