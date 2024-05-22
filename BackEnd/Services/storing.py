@@ -24,16 +24,29 @@ class QStore:
                 'normalize_embeddings': True # keep True to compute cosine similarity
             }
         )
-    
-    def index_documents(self, chunks):
-        
+       
+
+    def index_faq(self, source:Faq_Source):
+        chunks = {"text": f"Pergunta: {source.question}\nResposta: {source.answer}"}
         index = Qdrant.from_documents(
             chunks,
             embedding=self.embeddings,
-            url=QDRANT_URL,  
+            url=QDRANT_URL,
             collection_name="db"
         )
         index.client.close()
+ 
+
+    
+    def index_documents(self, chunks):
+        index = Qdrant.from_documents(
+            chunks,
+            embedding=self.embeddings,
+            url=QDRANT_URL,
+            collection_name="db"
+        )
+        index.client.close()
+
 
     def object_retriever(self):
         client = QdrantClient(url=QDRANT_URL)
