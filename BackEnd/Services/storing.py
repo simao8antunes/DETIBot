@@ -248,6 +248,41 @@ class MySql:
         except mysql.connector.Error as e:
             print(f"Error executing query: {e}")
             return {"error": f"Error executing query: {e}"}
+
+# FAQ_SOURCE 
+    def list_faq_sources(self):
+        q = "SELECT * FROM faq_source"
+        try:
+            self.cursor.execute(q)
+            filesource = self.cursor.fetchall()
+            return filesource
+        except mysql.connector.Error as e:
+            print(f"Error executing query: {e}")
+            return []
+        
+    def delete_faq_source(self, id):
+        q = "DELETE FROM faq_source WHERE id = %s"
+        try:
+            self.cursor.execute(q, (id,))
+            self.conn.commit()
+        except mysql.connector.Error as e:
+            print(f"Error executing query: {e}")
+    
+    def update_faq_source(self, id, source: Faq_Source):
+        q = """
+        UPDATE faq_source 
+        SET question = %s, answer = %s 
+        WHERE id = %s
+        """        
+        try:
+            self.cursor.execute(q,(source.question, source.answer,id))
+            self.conn.commit()
+            if self.cursor.rowcount == 0:
+                return {"error": "ID not found"}
+            return {"message": "Source updated successfully"}
+        except mysql.connector.Error as e:
+            print(f"Error executing query: {e}")
+            return {"error": f"Error executing query: {e}"}
     
     def __exit__(self, exc_type, exc_value, traceback):
         self.conn.close()
