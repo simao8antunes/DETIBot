@@ -31,7 +31,6 @@ CREATE TABLE IF NOT EXISTS file_source (
 CREATE TABLE IF NOT EXISTS faq_source (
     id INT AUTO_INCREMENT PRIMARY KEY,
     question VARCHAR(255),
-    answer VARCHAR(255)
     answer VARCHAR(255)  
 );
 

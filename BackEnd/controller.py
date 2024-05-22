@@ -24,7 +24,18 @@ app.add_middleware(
 @app.get("/detibot")
 async def root():
     return "This is the api for DETIBOT"
+#---------------------- endpoints that returns an answer given a prompt--------------------------- 
+@app.get("/detibot/en/{prompt}")
+async def Question(prompt: str):
+   reposta = procurador.queries(prompt,en)
+   return reposta["query"]
 
+@app.get("/detibot/pt/{prompt}")
+async def Question(prompt: str):
+   reposta = procurador.queries(prompt,pt)
+   return reposta["query"]
+
+#-------------------------enpoints that list every row of a table in mysql--------------------------
 @app.get("/detibot/url_sources")
 async def listUrlSources():
     return db.list_url_sources()
@@ -33,11 +44,12 @@ async def listUrlSources():
 async def listFileSources():
     return db.list_file_sources()
 
-@app.get("/detibot/{prompt}")
-async def Question(prompt: str):
-   reposta = procurador.queries(prompt)
-   return reposta["query"]
-    
+@app.get("/detibot/faq_sources")
+async def listFileSources():
+    return db.list_faq_sources()
+
+#------------------------ endpoints that post the diferent type of sources in the system-----------------
+
 @app.post("/detibot/insert_filesource")
 async def SourceFile(file: UploadFile = File(...), descript: str = Form(...)):
     if not file:
