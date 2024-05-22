@@ -27,12 +27,12 @@ async def root():
 #---------------------- endpoints that returns an answer given a prompt--------------------------- 
 @app.get("/detibot/en/{prompt}")
 async def Question(prompt: str):
-   reposta = procurador.queries(prompt,en)
+   reposta = procurador.queries(prompt,"en")
    return reposta["query"]
 
 @app.get("/detibot/pt/{prompt}")
 async def Question(prompt: str):
-   reposta = procurador.queries(prompt,pt)
+   reposta = procurador.queries(prompt,"pt")
    return reposta["query"]
 
 #-------------------------enpoints that list every row of a table in mysql--------------------------
