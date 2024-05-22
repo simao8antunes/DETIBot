@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS faq_source (
     id INT AUTO_INCREMENT PRIMARY KEY,
     question VARCHAR(255),
     answer VARCHAR(255)
+    answer VARCHAR(255)  
 );
 
 -- inserts the predefined rows of update_time
