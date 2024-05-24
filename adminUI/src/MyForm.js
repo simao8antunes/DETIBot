@@ -112,8 +112,12 @@ const MyForm = () => {
       });
       console.log('API response:', response.data);
       setLoading(false); // Set loading to false after response
-      setSuccess(true); // Set success to true
-      resetForm();
+      //meter aqui mensagem de alerta que não foi possivel fazer o laod da fonte
+      if (response.data.response == 'Successfull'){
+        setSuccess(true); // Set success to true
+        resetForm();
+      };
+
     } catch (error) {
       console.error('Error:', error);
       setLoading(false); // Set loading to false if there's an error

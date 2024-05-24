@@ -20,6 +20,7 @@ const App = () => {
       const urlResponse = await axios.get('http://localhost:8000/detibot/url_sources');
       const fileResponse = await axios.get('http://localhost:8000/detibot/file_sources');
       const faqResponse = await axios.get('http://localhost:8000/detibot/faq_sources');
+      console.log(faqResponse.data)
       setUrlSources(urlResponse.data);
       setFileSources(fileResponse.data);
       setFaqSources(faqResponse.data);

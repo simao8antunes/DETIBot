@@ -10,11 +10,12 @@ CREATE TABLE IF NOT EXISTS update_time (
 -- Creates source table
 CREATE TABLE IF NOT EXISTS url_source (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    url_link VARCHAR(255),
+    url_link VARCHAR(255) UNIQUE,
     paths VARCHAR(255),
     descript VARCHAR(255),
     wait_time INT,
     recursive_url BOOLEAN,
+    update_period_str VARCHAR(255),
     update_period_id INT,
     FOREIGN KEY (update_period_id) REFERENCES update_time (id)
 );
@@ -22,7 +23,7 @@ CREATE TABLE IF NOT EXISTS url_source (
 -- Creates source table
 CREATE TABLE IF NOT EXISTS file_source (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    file_name VARCHAR(255),
+    file_name VARCHAR(255) UNIQUE,
     file_path VARCHAR(255),
     loader_type VARCHAR(255),
     descript VARCHAR(255)
@@ -31,7 +32,7 @@ CREATE TABLE IF NOT EXISTS file_source (
 CREATE TABLE IF NOT EXISTS faq_source (
     id INT AUTO_INCREMENT PRIMARY KEY,
     question VARCHAR(255),
-    answer VARCHAR(255)  
+    answer VARCHAR(255) 
 );
 
 -- inserts the predefined rows of update_time

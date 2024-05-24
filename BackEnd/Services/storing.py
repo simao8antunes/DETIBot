@@ -5,7 +5,7 @@
 
 from Services import File_Source, URL_Source, Faq_Source
 from qdrant_client import QdrantClient
-from qdrant_client.models import Filter, FieldCondition,MatchValue, models
+from qdrant_client.models import Filter, FieldCondition,MatchValue
 from langchain_community.vectorstores.qdrant import Qdrant
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from datetime import datetime, timedelta
@@ -28,8 +28,8 @@ class QStore:
         )
        
 
-    def index_faq(self, source:Faq_Source):
-        chunks = [Document(page_content=f"Pergunta: {source.question}\nResposta: {source.answer}",metadata={"source": {source.question}})]
+    def index_faq(self, source:Faq_Source,meta):
+        chunks = [Document(page_content=f"Pergunta: {source.question}\nResposta: {source.answer}",metadata={"source": {meta}})]
         index = Qdrant.from_documents(
             chunks,
             embedding=self.embeddings,
@@ -37,7 +37,7 @@ class QStore:
             collection_name="db"
         )
         index.client.close()
-        return {"Loading": "Successfull"}
+        return {"response": "Successfull"}
  
 
     
@@ -115,18 +115,22 @@ class MySql:
                 Id = 4
             insert_sql = (
                 "INSERT INTO url_source "
-                "(url_link, paths, descript, wait_time, recursive_url, update_period_id) "
-                "VALUES (%s, %s, %s, %s, %s, %s)"
+                "(url_link, paths, descript, wait_time, recursive_url,  update_period_str, update_period_id) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s)"
             )
-            params = (source.url, ','.join(source.paths), source.description, source.wait_time, source.recursive, Id)
+            params = (source.url, ','.join(source.paths), source.description, source.wait_time, source.recursive, source.update_period,Id)
 
         elif isinstance(source,Faq_Source):
-            insert_sql = (
-                "INSERT INTO faq_source "
-                "(question,answer) "
-                "VALUES (%s, %s)"
-            )
-            params = (source.question,source.answer)
+            faq_id = self.get("SELECT id FROM faq_source WHERE question = %s AND answer = %s",[source.question,source.answer])
+            if faq_id == []:
+                insert_sql = (
+                    "INSERT INTO faq_source "
+                    "(question,answer) "
+                    "VALUES (%s, %s)"
+                )
+                params = (source.question,source.answer)
+            else:
+                return {"response": "This value already exists"}
         else:
             return "Invalid source type"
 
@@ -134,7 +138,13 @@ class MySql:
             self.cursor.execute(insert_sql,params) # maybe put here a logger and a try/ctach
             self.conn.commit()
         except mysql.connector.Error as e:
-            print("Error inserting to MySQL:", e)
+            error_message = str(e)
+            if "Duplicate entry" in error_message:
+                return {"response": "This value already exists"}
+            else:
+                print("Error inserting to MySQL:", e)
+                return {"response": "Error inserting to MySQL: " + str(e)}
+        return {"response": True}
 
     def update_time(self,idx):# updates the period time in the update time table 
         update_sql = """
@@ -184,9 +194,19 @@ class MySql:
             return []
         
     def search_url_sources(self,search:str):
-        q = "SELECT * FROM url_source WHERE url_link is LIKE "
+        q = """
+            SELECT * FROM url_source 
+            WHERE id LIKE %s OR
+                  url_link LIKE %s OR
+                  paths LIKE %s OR
+                  wait_time LIKE %s OR
+                  recursive_url LIKE %s OR
+                  update_period_str LIKE %s or
+                  descript LIKE %s 
+            """
+
         try:
-            self.cursor.execute(q)
+            self.cursor.execute(q, ('%' + search + '%',))
             urlsource = self.cursor.fetchall()
             formatted_sources = [
                 {
@@ -234,18 +254,57 @@ class MySql:
             self.conn.commit()
             if self.cursor.rowcount == 0:
                 return {"error": "ID not found"}
-            return {"message": "Source updated successfully"}
         except mysql.connector.Error as e:
-            print(f"Error executing query: {e}")
-            return {"error": f"Error executing query: {e}"}
+            error_message = str(e)
+            if "Duplicate entry" in error_message:
+                return {"response": "This value already exists"}
+            else:
+                print("Error inserting to MySQL:", e)
+                return {"response": "Error inserting to MySQL: " + str(e)}
+        return {"response": True}
 
-# FILE_SOURCE
+# FILE_SOURCE        
     def list_file_sources(self):
         q = "SELECT * FROM file_source"
         try:
             self.cursor.execute(q)
             filesource = self.cursor.fetchall()
-            return filesource
+            formatted_sources = [
+                {
+                    "id": item[0],
+                    "file_name": item[1],
+                    "file_path": item[2], 
+                    "description": item[3],  
+                }
+                for item in filesource
+            ]
+            return formatted_sources
+        except mysql.connector.Error as e:
+            print(f"Error executing query: {e}")
+            return []
+    
+    def search_file_sources(self,search:str):
+        q = """
+            SELECT * FROM file_source 
+            WHERE id LIKE %s OR
+                  file_name LIKE %s OR
+                  descript LIKE %s OR
+                  loader_type LIKE %s
+            """
+
+        try:
+            self.cursor.execute(q, ('%' + search + '%',))
+            filesource = self.cursor.fetchall()
+            formatted_sources = [
+                {
+                    "id": item[0],
+                    "file_name": item[1],
+                    "file_path": item[2], 
+                    "description": item[3],  
+                }
+                for item in filesource
+            ]
+            return formatted_sources
         except mysql.connector.Error as e:
             print(f"Error executing query: {e}")
             return []
@@ -269,18 +328,54 @@ class MySql:
             self.conn.commit()
             if self.cursor.rowcount == 0:
                 return {"error": "ID not found"}
-            return {"message": "Source updated successfully"}
         except mysql.connector.Error as e:
-            print(f"Error executing query: {e}")
-            return {"error": f"Error executing query: {e}"}
+            error_message = str(e)
+            if "Duplicate entry" in error_message:
+                return {"response": "This value already exists"}
+            else:
+                print("Error inserting to MySQL:", e)
+                return {"response": "Error inserting to MySQL: " + str(e)}
+        return {"response": True}
 
 # FAQ_SOURCE 
     def list_faq_sources(self):
         q = "SELECT * FROM faq_source"
         try:
             self.cursor.execute(q)
-            filesource = self.cursor.fetchall()
-            return filesource
+            faqsource = self.cursor.fetchall()
+            formatted_sources = [
+                {
+                    "id": item[0],
+                    "question": item[1],
+                    "answer": item[2],  
+                }
+                for item in faqsource
+            ]
+            return formatted_sources
+        except mysql.connector.Error as e:
+            print(f"Error executing query: {e}")
+            return []
+        
+    def search_faq_sources(self,search:str):
+        q = """
+            SELECT * FROM file_source 
+            WHERE id LIKE %s OR
+                  question LIKE %s OR
+                  answer LIKE %s 
+            """
+
+        try:
+            self.cursor.execute(q, ('%' + search + '%',))
+            faqsource = self.cursor.fetchall()
+            formatted_sources = [
+                {
+                    "id": item[0],
+                    "question": item[1],
+                    "answer": item[2],  
+                }
+                for item in faqsource
+            ]
+            return formatted_sources
         except mysql.connector.Error as e:
             print(f"Error executing query: {e}")
             return []
@@ -294,20 +389,23 @@ class MySql:
             print(f"Error executing query: {e}")
     
     def update_faq_source(self, id, source: Faq_Source):
-        q = """
-        UPDATE faq_source 
-        SET question = %s, answer = %s 
-        WHERE id = %s
-        """        
-        try:
-            self.cursor.execute(q,(source.question, source.answer,id))
-            self.conn.commit()
-            if self.cursor.rowcount == 0:
-                return {"error": "ID not found"}
-            return {"message": "Source updated successfully"}
-        except mysql.connector.Error as e:
-            print(f"Error executing query: {e}")
-            return {"error": f"Error executing query: {e}"}
+        faq_id = self.get("SELECT id FROM faq_source WHERE question = %s AND answer = %s",[source.question,source.answer])
+        if faq_id == []:
+            q = """
+            UPDATE faq_source 
+            SET question = %s, answer = %s 
+            WHERE id = %s
+            """        
+            try:
+                self.cursor.execute(q,(source.question, source.answer,id))
+                self.conn.commit()
+                if self.cursor.rowcount == 0:
+                    return {"error": "ID not found"}
+                return {"message": "Source updated successfully"}
+            except mysql.connector.Error as e:
+                print(f"Error executing query: {e}")
+                return {"error": f"Error executing query: {e}"}
+        return {"response": "This value already exists"} 
     
     def __exit__(self, exc_type, exc_value, traceback):
         self.conn.close()

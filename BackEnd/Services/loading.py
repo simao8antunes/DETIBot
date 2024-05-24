@@ -13,21 +13,17 @@ from langchain_community.document_loaders import Docx2txtLoader, CSVLoader, JSON
 import os
 from Services.seleniumLoader import SeleniumURLLoaderWithWait as urlLoader
 
-qstore = QStore()
 indexer = Indexing()
 PDF_PATH = "./Data"
-#rag = Rag()
 
 class Loading:
 
     def url_loader(self, source: URL_Source):
-        qstore.delete_vectors(source.url)
         documents=self.load_urls(source)
         indexer.index(documents)
-        return {"Loading": "Successfull"}
+        return {"response": "Successfull"}
     
     def file_loader(self, source: File_Source):
-        qstore.delete_vectors(source.file_path)
         if source.loader_type == "application/pdf":
             documents = self.load_pdf(source)
         elif source.loader_type == "application/csv":
@@ -41,7 +37,7 @@ class Loading:
         else:
             documents = self.load_text(source)
         indexer.index(documents)
-        return {"Loading": "Successfull"}
+        return {"response": "Successfull"}
     
     def load_csv(self, source):
         loader = CSVLoader(file_path=source.file_path)
