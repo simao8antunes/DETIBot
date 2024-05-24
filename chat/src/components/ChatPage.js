@@ -29,7 +29,7 @@ const ChatPage = () => {
 
             // Send the user's message to the API and handle the response
             try {
-                const url = `http://${API_ADDR}/detibot/${encodeURIComponent(newMessage)}`;
+                const url = `http://${API_ADDR}/detibot/${language}/${encodeURIComponent(newMessage)}`;
                 const response = await axios.get(url);
 
                 // Handle the API response
