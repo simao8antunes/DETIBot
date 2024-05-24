@@ -182,6 +182,28 @@ class MySql:
             print(f"Error executing query: {e}")
             return []
         
+    def search_url_sources(self,search:str):
+        q = "SELECT * FROM url_source WHERE url_link is LIKE "
+        try:
+            self.cursor.execute(q)
+            urlsource = self.cursor.fetchall()
+            formatted_sources = [
+                {
+                    "id": item[0],
+                    "url": item[1],
+                    "paths": item[2].split(','), 
+                    "update_period": item[6],
+                    "description": item[3],  
+                    "wait_time": item[4],
+                    "recursive": bool(item[5])
+                }
+                for item in urlsource
+            ]
+            return formatted_sources
+        except mysql.connector.Error as e:
+            print(f"Error executing query: {e}")
+            return []
+        
     def delete_url_source(self, id):
         q = "DELETE FROM url_source WHERE id = %s"
         try:

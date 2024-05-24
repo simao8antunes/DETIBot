@@ -26,12 +26,12 @@ async def root():
     return "This is the api for DETIBOT"
 #---------------------- endpoints that returns an answer given a prompt--------------------------- 
 @app.get("/detibot/en/{prompt}")
-async def Question(prompt: str):
+async def QuestionEn(prompt: str):
    reposta = procurador.queries(prompt,"en")
    return reposta["query"]
 
 @app.get("/detibot/pt/{prompt}")
-async def Question(prompt: str):
+async def QuestionPt(prompt: str):
    reposta = procurador.queries(prompt,"pt")
    return reposta["query"]
 
@@ -45,9 +45,21 @@ async def listFileSources():
     return db.list_file_sources()
 
 @app.get("/detibot/faq_sources")
-async def listFileSources():
+async def listFaqSources():
     return db.list_faq_sources()
 
+#------------------------ endpoints to apply a search bar in each table of sources-------------------
+@app.get("/detibot/Search_url_sources/{search}")
+async def searchUrlSources(search:str):
+    return db.search_url_sources()
+
+@app.get("/detibot/Search_file_sources/{search}")
+async def searchFileSources(search:str):
+    return db.search_file_sources()
+
+@app.get("/detibot/Search_faq_sources/{search}")
+async def searchFaqSources(search:str):
+    return db.search_faq_sources()
 #------------------------ endpoints that post the diferent type of sources in the system-----------------
 
 @app.post("/detibot/insert_filesource")
@@ -65,7 +77,6 @@ async def SourceFile(file: UploadFile = File(...), descript: str = Form(...)):
     #loads the new source object
     load.file_loader(source)
 
-
 @app.post("/detibot/insert_urlsource")
 async def SourceUrl(source: URL_Source):
     #inserts the source object into the db
@@ -74,7 +85,7 @@ async def SourceUrl(source: URL_Source):
     load.url_loader(source)
 
 @app.post("/detibot/insert_faqsource")
-async def SourceUrl(source: Faq_Source):
+async def SourceFaq(source: Faq_Source):
     print(source)
     #inserts the source object into the db
     qstore.delete_vectors(source.question)
@@ -92,12 +103,21 @@ async def deleteUrlSource(id: int):
 @app.delete("/detibot/delete_filesource/{id}")
 async def deleteFileSource(id: int):
     current_source = db.get("SELECT file_path FROM url_source WHERE id = %s",[id])
-    qstore.delete_vectors(current_source[0])
-    db.delete_file_source(id)
+    if not os.path.exists(current_source[0]):
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    try:
+        os.remove(current_source[0])
+        qstore.delete_vectors(current_source[0])
+        db.delete_file_source(id)
+        return {"detail": "File deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting file: {e}")
+
     #falta dar delete na pasta do uploads
 
 @app.delete("/detibot/delete_faqsource/{id}")
-async def deleteFileSource(id: int):
+async def deleteFaqSource(id: int):
     current_source = db.get("SELECT question FROM faq_source WHERE id = %s",[id])
     qstore.delete_vectors(current_source[0])
     db.delete_faq_source(id)
@@ -129,7 +149,7 @@ async def updateFileSource(id: int,file: UploadFile = File(...), descript: str =
     load.file_loader(updated_source)
 
 @app.put("/detibot/update_faqsource/{id}")
-async def updateUrlSource(id: int,source: Faq_Source):
+async def updateFaqSource(id: int,source: Faq_Source):
     db.update_faq_source(id, source)
     qstore.delete_vectors(source.question)
     qstore.index_faq(source)
