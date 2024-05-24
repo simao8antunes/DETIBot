@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Form, Button, Card, Row, Col, Tabs, Tab, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
-
 
 const MyForm = () => {
   const [sourceType, setSourceType] = useState('file');
@@ -18,6 +17,8 @@ const MyForm = () => {
   const [success, setSuccess] = useState(false); // Success state
   const [questions, setQuestions] = useState(''); // State for questions
   const [answers, setAnswers] = useState(''); // State for answers
+
+  const fileInputRef = useRef(null); // Ref for file input
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]); // Set the file object directly
@@ -73,10 +74,11 @@ const MyForm = () => {
     setSuccess(false); // Reset success state
 
     let apiUrl = '';
-    let data = new FormData();
+    let data;
 
     if (sourceType === 'file') {
       apiUrl = 'http://localhost:8000/detibot/insert_filesource';
+      data = new FormData();
       data.append('file', file);
       data.append('descript', description);
     } else if (sourceType === 'url') {
@@ -91,12 +93,16 @@ const MyForm = () => {
         recursive: recursive
       };
     } else if (sourceType === 'qa') {
-      apiUrl = 'http://localhost:8000/detibot/insert_qasource';
+      apiUrl = 'http://localhost:8000/detibot/insert_faqsource';
       data = {
-        questions: questions,
-        answers: answers
+        question: questions,
+        answer: answers
       };
     }
+
+    console.log(sourceType);
+    console.log(data);
+    console.log(apiUrl);
 
     try {
       const response = await axios.post(apiUrl, data, {
@@ -107,20 +113,25 @@ const MyForm = () => {
       console.log('API response:', response.data);
       setLoading(false); // Set loading to false after response
       setSuccess(true); // Set success to true
-      setFile(null); // Using null instead of empty string for file
-      setUrl('');
-      setDescription('');
-      setFrequency('');
-      setRecursive(false);
-      setPathsEnabled(false);
-      setPaths([]);
-      setQuestions(''); // Reset questions
-      setAnswers(''); // Reset answers
+      resetForm();
     } catch (error) {
       console.error('Error:', error);
       setLoading(false); // Set loading to false if there's an error
       setSuccess(false); // Reset success state in case of error
     }
+  };
+
+  const resetForm = () => {
+    setFile(null); // Using null instead of empty string for file
+    setUrl('');
+    setDescription('');
+    setFrequency('');
+    setRecursive(false);
+    setPathsEnabled(false);
+    setPaths([]);
+    setQuestions(''); // Reset questions
+    setAnswers(''); // Reset answers
+    fileInputRef.current.value = '';
   };
 
   return (
@@ -140,6 +151,7 @@ const MyForm = () => {
                   <Form.Label>Upload File:</Form.Label>
                   <Form.Control
                     type="file"
+                    ref={fileInputRef} // Assign ref to file input
                     onChange={handleFileChange}
                     style={{ color: '#1e90ff' }}
                   />

@@ -37,6 +37,7 @@ class QStore:
             collection_name="db"
         )
         index.client.close()
+        return {"Loading": "Successfull"}
  
 
     
