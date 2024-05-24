@@ -86,7 +86,6 @@ async def SourceUrl(source: URL_Source):
 
 @app.post("/detibot/insert_faqsource")
 async def SourceFaq(source: Faq_Source):
-    print(source)
     #inserts the source object into the db
     qstore.delete_vectors(source.question)
     db.insert_source(source)
