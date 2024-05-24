@@ -274,7 +274,7 @@ class MySql:
                     "id": item[0],
                     "file_name": item[1],
                     "file_path": item[2], 
-                    "description": item[3],  
+                    "description": item[4],  
                 }
                 for item in filesource
             ]

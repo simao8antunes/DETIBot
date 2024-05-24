@@ -87,17 +87,52 @@
 
 .table-sm th.id-column,
 .table-sm td.id-column {
-  width: 10%; /* Set width for ID column */
-}
-
-.table-sm th.action-column,
-.table-sm td.action-column {
-  width: 15%; /* Set width for Action column */
+  width: 5%; /* Set width for ID column */
 }
 
 .table-sm th.url-column,
 .table-sm td.url-column {
-  width: 75%; /* Set width for URL column */
+  width: 20%; /* Set width for URL column */
+}
+
+.table-sm th.paths-column,
+.table-sm td.paths-column {
+  width: 20%; /* Set width for Paths column */
+}
+
+.table-sm th.update-period-column,
+.table-sm td.update-period-column {
+  width: 15%; /* Set width for Update Period column */
+}
+
+.table-sm th.description-column,
+.table-sm td.description-column {
+  width: 25%; /* Set width for Description column */
+}
+
+.table-sm th.recursive-column,
+.table-sm td.recursive-column {
+  width: 10%; /* Set width for Recursive column */
+}
+
+.table-sm th.action-column,
+.table-sm td.action-column {
+  width: 10%; /* Set width for Action column */
+}
+
+.table-sm th.file-name-column,
+.table-sm td.file-name-column {
+  width: 20%; /* Set width for File Name column */
+}
+
+.table-sm th.file-path-column,
+.table-sm td.file-path-column {
+  width: 25%; /* Set width for File Path column */
+}
+
+.table-sm th.file-description-column,
+.table-sm td.file-description-column {
+  width: 30%; /* Set width for Description column */
 }
 
 .search-bar {

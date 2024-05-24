@@ -89,6 +89,10 @@ const App = () => {
                     <tr>
                       <th className="id-column">ID</th>
                       <th className="url-column">URL</th>
+                      <th className="paths-column">Paths</th>
+                      <th className="update-period-column">Update Period</th>
+                      <th className="description-column">Description</th>
+                      <th className="recursive-column">Recursive</th>
                       <th className="action-column">Action</th>
                     </tr>
                   </thead>
@@ -97,6 +101,10 @@ const App = () => {
                       <tr key={source.id}>
                         <td className="id-column">{source.id}</td>
                         <td className="url-column">{source.url}</td>
+                        <td className="paths-column">{source.paths.join(', ')}</td>
+                        <td className="update-period-column">{source.update_period}</td>
+                        <td className="description-column">{source.description}</td>
+                        <td className="recursive-column">{source.recursive ? 'Yes' : 'No'}</td>
                         <td className="action-column">
                           <Button variant="danger" size="sm" onClick={() => deleteEntry('url', source.id)}>Delete</Button>
                         </td>
@@ -126,7 +134,9 @@ const App = () => {
                   <thead className="thead-light">
                     <tr>
                       <th className="id-column">ID</th>
-                      <th className="url-column">File</th>
+                      <th className="file-name-column">File Name</th>
+                      <th className="file-path-column">File Path</th>
+                      <th className="file-description-column">Description</th>
                       <th className="action-column">Action</th>
                     </tr>
                   </thead>
@@ -134,7 +144,9 @@ const App = () => {
                     {fileSources.map((source) => (
                       <tr key={source.id}>
                         <td className="id-column">{source.id}</td>
-                        <td className="url-column">{source.file}</td>
+                        <td className="file-name-column">{source.file_name}</td>
+                        <td className="file-path-column">{source.file_path}</td>
+                        <td className="file-description-column">{source.description}</td>
                         <td className="action-column">
                           <Button variant="danger" size="sm" onClick={() => deleteEntry('file', source.id)}>Delete</Button>
                         </td>
@@ -164,7 +176,8 @@ const App = () => {
                   <thead className="thead-light">
                     <tr>
                       <th className="id-column">ID</th>
-                      <th className="url-column">FAQ</th>
+                      <th className="question-column">Question</th>
+                      <th className="answer-column">Answer</th>
                       <th className="action-column">Action</th>
                     </tr>
                   </thead>
@@ -172,7 +185,8 @@ const App = () => {
                     {faqSources.map((source) => (
                       <tr key={source.id}>
                         <td className="id-column">{source.id}</td>
-                        <td className="url-column">{source.faq}</td>
+                        <td className="question-column">{source.question}</td>
+                        <td className="answer-column">{source.answer}</td>
                         <td className="action-column">
                           <Button variant="danger" size="sm" onClick={() => deleteEntry('faq', source.id)}>Delete</Button>
                         </td>
