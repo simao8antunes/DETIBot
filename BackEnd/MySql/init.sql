@@ -20,6 +20,13 @@ CREATE TABLE IF NOT EXISTS url_source (
     FOREIGN KEY (update_period_id) REFERENCES update_time (id)
 );
 
+CREATE TABLE IF NOT EXISTS url_child_source (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    url_link VARCHAR(255),
+    parent_id INT,
+    FOREIGN KEY (parent_id) REFERENCES url_source (id)
+);
+
 -- Creates source table
 CREATE TABLE IF NOT EXISTS file_source (
     id INT AUTO_INCREMENT PRIMARY KEY,

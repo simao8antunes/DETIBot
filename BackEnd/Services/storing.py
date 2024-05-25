@@ -146,6 +146,29 @@ class MySql:
                 return {"response": "Error inserting to MySQL: " + str(e)}
         return {"response": True}
 
+    def insert_child(self,childs:set):
+        parent = child[0]
+        parent_id = self.get("SELECT id FROM url_source WHERE url_link = %s",[parent])
+        print(parent_id)
+        for child in childs[1:]:
+            insert_sql = (
+                "INSERT INTO url_child_source "
+                "(url_link,parent_id) "
+                "VALUES (%s, %s)"
+            )
+            params = (child,parent_id[0][0])
+
+            try:
+                self.cursor.execute(insert_sql,params) # maybe put here a logger and a try/ctach
+                self.conn.commit()
+            except mysql.connector.Error as e:
+                print("Error inserting to MySQL:", e)
+                return {"response": "Error inserting to MySQL: " + str(e)}
+        
+        return {"response": True}
+
+
+
     def update_time(self,idx):# updates the period time in the update time table 
         update_sql = """
         UPDATE update_time SET update_period = %s WHERE id = %s
@@ -201,12 +224,15 @@ class MySql:
                   paths LIKE %s OR
                   wait_time LIKE %s OR
                   recursive_url LIKE %s OR
-                  update_period_str LIKE %s or
+                  update_period_str LIKE %s OR
                   descript LIKE %s 
             """
 
+        search_param = '%' + search + '%'
+        params = (search_param,) * 7
+
         try:
-            self.cursor.execute(q, ('%' + search + '%',))
+            self.cursor.execute(q, params)
             urlsource = self.cursor.fetchall()
             formatted_sources = [
                 {
@@ -291,16 +317,18 @@ class MySql:
                   descript LIKE %s OR
                   loader_type LIKE %s
             """
+        search_param = '%' + search + '%'
+        params = (search_param,) * 4
 
         try:
-            self.cursor.execute(q, ('%' + search + '%',))
+            self.cursor.execute(q, params)
             filesource = self.cursor.fetchall()
             formatted_sources = [
                 {
                     "id": item[0],
                     "file_name": item[1],
                     "file_path": item[2], 
-                    "description": item[3],  
+                    "description": item[4],  
                 }
                 for item in filesource
             ]
@@ -358,14 +386,16 @@ class MySql:
         
     def search_faq_sources(self,search:str):
         q = """
-            SELECT * FROM file_source 
+            SELECT * FROM faq_source 
             WHERE id LIKE %s OR
                   question LIKE %s OR
                   answer LIKE %s 
             """
+        search_param = '%' + search + '%'
+        params = (search_param,) * 3
 
         try:
-            self.cursor.execute(q, ('%' + search + '%',))
+            self.cursor.execute(q, params)
             faqsource = self.cursor.fetchall()
             formatted_sources = [
                 {

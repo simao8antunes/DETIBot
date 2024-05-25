@@ -1,6 +1,6 @@
 from langchain_core.documents import Document
 from langchain_community.document_loaders.url_selenium import SeleniumURLLoader
-from typing import List
+from typing import List,Tuple
 import logging
 import time
 from urllib.parse import urlparse, urljoin
@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 logger = logging.getLogger(__name__)
 
 class SeleniumURLLoaderWithWait(SeleniumURLLoader):
-    def load(self, wait_time: int = 3, recursive: bool = False, paths: List = []) -> List[Document]:
+    def load(self, wait_time: int = 3, recursive: bool = False, paths: List = []) -> Tuple[List[Document],set]:
         from unstructured.partition.html import partition_html
 
         start_time = time.time()
@@ -69,7 +69,7 @@ class SeleniumURLLoaderWithWait(SeleniumURLLoader):
         end_time = time.time()
         elapsed_time = end_time - start_time
         print(f"Time taken to execute load: {elapsed_time:.2f} seconds")
-        return docs
+        return docs, visited_urls
 
     def _get_driver(self):
         from selenium import webdriver

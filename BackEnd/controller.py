@@ -71,7 +71,6 @@ async def SourceFile(file: UploadFile = File(...), descript: str = Form(...)):
     source = File_Source(file_name=file.filename,file_path=file_location,loader_type=file.content_type,description=descript)
     #inserts the source object into the db
     response = db.insert_source(source)
-    print(response)
     if response["response"] is True:
         #loads the new source object
         
@@ -99,7 +98,6 @@ async def SourceFaq(source: Faq_Source):
         sourceId = db.get("SELECT id FROM faq_source WHERE question = %s",[source.question])
         #loads the new source object
         meta = str(sourceId[0][0]) + source.question
-        print(meta)
         return qstore.index_faq(source,meta)
     else:
         return response   
@@ -114,7 +112,6 @@ async def deleteUrlSource(id: int):
 @app.delete("/detibot/delete_filesource/{id}")
 async def deleteFileSource(id: int):
     current_source = db.get("SELECT file_path FROM file_source WHERE id = %s",[id])
-    print(current_source[0][0])
     
     if not os.path.exists(current_source[0][0]):
         qstore.delete_vectors(current_source[0][0])
@@ -134,7 +131,6 @@ async def deleteFileSource(id: int):
 @app.delete("/detibot/delete_faqsource/{id}")
 async def deleteFaqSource(id: int):
     current_source = db.get("SELECT question FROM faq_source WHERE id = %s",[id])
-    print(current_source)
     qstore.delete_vectors(str(id)+current_source[0][0])
     db.delete_faq_source(id)
 

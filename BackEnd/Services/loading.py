@@ -5,7 +5,7 @@
 
 from Services.classes import URL_Source, File_Source
 from Services.indexing import Indexing
-from Services.storing import QStore
+from Services.storing import MySql
 
 from langchain_community.document_loaders.pdf import PyPDFLoader
 from langchain_community.document_loaders import Docx2txtLoader, CSVLoader, JSONLoader, UnstructuredHTMLLoader, TextLoader
@@ -13,13 +13,16 @@ from langchain_community.document_loaders import Docx2txtLoader, CSVLoader, JSON
 import os
 from Services.seleniumLoader import SeleniumURLLoaderWithWait as urlLoader
 
+db = MySql()
 indexer = Indexing()
 PDF_PATH = "./Data"
 
 class Loading:
 
     def url_loader(self, source: URL_Source):
-        documents=self.load_urls(source)
+        documents,childs=self.load_urls(source)
+        if source.recursive:
+            db.insert_child(childs)
         indexer.index(documents)
         return {"response": "Successfull"}
     
