@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { DropdownButton, Dropdown } from 'react-bootstrap';
+import { DropdownButton, Dropdown, Spinner } from 'react-bootstrap';
 import '../ChatPage.css';
 import userAvatar from '../assets/user-avatar.jpg'; // Placeholder user avatar
 import botAvatar from '../assets/bot-avatar.jpg'; // Bot avatar
@@ -11,6 +11,7 @@ const ChatPage = () => {
     const [messages, setMessages] = useState([]); // State for storing chat messages
     const [newMessage, setNewMessage] = useState(''); // State for the current input
     const [language, setLanguage] = useState('en'); // State for the selected language
+    const [loading, setLoading] = useState(false); // State for loading indicator
 
     // Function to handle sending a new message
     const handleSendMessage = async () => {
@@ -26,6 +27,9 @@ const ChatPage = () => {
 
             // Clear the input field
             setNewMessage('');
+
+            // Set loading state to true
+            setLoading(true);
 
             // Send the user's message to the API and handle the response
             try {
@@ -44,6 +48,9 @@ const ChatPage = () => {
             } catch (error) {
                 console.error('Error sending message to API:', error);
                 // Optionally handle the error (e.g., display an error message to the user)
+            } finally {
+                // Set loading state to false
+                setLoading(false);
             }
         }
     };
@@ -118,6 +125,15 @@ const ChatPage = () => {
                             </div>
                         ))}
                     </div>
+
+                    {/* Loading spinner */}
+                    {loading && (
+                        <div className="text-center mt-3">
+                            <Spinner animation="border" role="status" style={{ color: '#FFFFFF' }}>
+                                <span className="sr-only"></span>
+                            </Spinner>
+                        </div>
+                    )}
 
                     {/* Chat input field and send button */}
                     <div className="input-group mt-3">

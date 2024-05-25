@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Form, FormControl, Container, Row, Col, Card } from 'react-bootstrap';
+import { Table, Button, Form, FormControl, Container, Row, Col, Card, Modal } from 'react-bootstrap';
 import axios from 'axios';
+import debounce from 'lodash.debounce'; // Import debounce from lodash
 import './App.css'; // Import the custom CSS file
 
 const App = () => {
@@ -11,6 +12,10 @@ const App = () => {
   const [searchFile, setSearchFile] = useState('');
   const [searchFaq, setSearchFaq] = useState('');
 
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState('');
+  const [modalData, setModalData] = useState({});
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -20,7 +25,6 @@ const App = () => {
       const urlResponse = await axios.get('http://localhost:8000/detibot/url_sources');
       const fileResponse = await axios.get('http://localhost:8000/detibot/file_sources');
       const faqResponse = await axios.get('http://localhost:8000/detibot/faq_sources');
-      console.log(faqResponse.data)
       setUrlSources(urlResponse.data);
       setFileSources(fileResponse.data);
       setFaqSources(faqResponse.data);
@@ -52,12 +56,84 @@ const App = () => {
     };
 
     try {
+      if (query === '') {
+        fetchData();
+        return;
+      }
+
+      console.log(`Searching ${type} with query:`, query);
       const response = await axios.get(endpoints[type]);
+      console.log(`Response for ${type}:`, response.data);
+
       if (type === 'url') setUrlSources(response.data);
       if (type === 'file') setFileSources(response.data);
       if (type === 'faq') setFaqSources(response.data);
     } catch (error) {
-      console.error('Error searching entries', error);
+      console.error(`Error searching ${type} entries`, error);
+    }
+  };
+
+  const debouncedSearchUrl = debounce((query) => searchEntries('url', query), 300);
+  const debouncedSearchFile = debounce((query) => searchEntries('file', query), 300);
+  const debouncedSearchFaq = debounce((query) => searchEntries('faq', query), 300);
+
+  useEffect(() => {
+    debouncedSearchUrl(searchUrl);
+  }, [searchUrl]);
+
+  useEffect(() => {
+    debouncedSearchFile(searchFile);
+  }, [searchFile]);
+
+  useEffect(() => {
+    debouncedSearchFaq(searchFaq);
+  }, [searchFaq]);
+
+  const handleShowModal = (type, data) => {
+    setModalType(type);
+    setModalData(data);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => setShowModal(false);
+
+  const handleUpdate = async () => {
+    const { id } = modalData;
+    const endpoints = {
+      url: `http://localhost:8000/detibot/update_urlsource/${id}`,
+      file: `http://localhost:8000/detibot/update_filesource/${id}`,
+      faq: `http://localhost:8000/detibot/update_faqsource/${id}`,
+    };
+
+    try {
+      if (modalType === 'url') {
+        const updateData = {
+          ...modalData,
+          wait_time: 3,
+          update_period_id: {
+            Daily: 1,
+            Weekly: 2,
+            Monthly: 3,
+            Quarterly: 4,
+          }[modalData.update_period],
+        };
+        await axios.put(endpoints.url, updateData);
+      } else if (modalType === 'file') {
+        const formData = new FormData();
+        formData.append('file', modalData.file);
+        formData.append('descript', modalData.description);
+        await axios.put(endpoints.file, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      } else if (modalType === 'faq') {
+        await axios.put(endpoints.faq, modalData);
+      }
+      fetchData();
+      handleCloseModal();
+    } catch (error) {
+      console.error(`Error updating ${modalType} entry`, error);
     }
   };
 
@@ -81,14 +157,16 @@ const App = () => {
                   value={searchUrl}
                   onChange={(e) => setSearchUrl(e.target.value)}
                 />
-                <Button variant="outline-success" onClick={() => searchEntries('url', searchUrl)}>Search</Button>
               </Form>
               <div className="table-wrapper">
-                <Table responsive striped hover className="table-sm">
+                <Table responsive striped hover className="table-sm url-table">
                   <thead className="thead-light">
                     <tr>
                       <th className="id-column">ID</th>
                       <th className="url-column">URL</th>
+                      <th className="description-column">Description</th>
+                      <th className="paths-column">Paths</th>
+                      <th className="update-period-column">Update Period</th>
                       <th className="action-column">Action</th>
                     </tr>
                   </thead>
@@ -97,8 +175,12 @@ const App = () => {
                       <tr key={source.id}>
                         <td className="id-column">{source.id}</td>
                         <td className="url-column">{source.url}</td>
+                        <td className="description-column">{source.description}</td>
+                        <td className="paths-column">{source.paths.join(', ')}</td>
+                        <td className="update-period-column">{source.update_period}</td>
                         <td className="action-column">
                           <Button variant="danger" size="sm" onClick={() => deleteEntry('url', source.id)}>Delete</Button>
+                          <Button className="update-button" size="sm" onClick={() => handleShowModal('url', source)}>Update</Button>
                         </td>
                       </tr>
                     ))}
@@ -119,14 +201,15 @@ const App = () => {
                   value={searchFile}
                   onChange={(e) => setSearchFile(e.target.value)}
                 />
-                <Button variant="outline-success" onClick={() => searchEntries('file', searchFile)}>Search</Button>
               </Form>
               <div className="table-wrapper">
                 <Table responsive striped hover className="table-sm">
                   <thead className="thead-light">
                     <tr>
                       <th className="id-column">ID</th>
-                      <th className="url-column">File</th>
+                      <th className="file-name-column">File Name</th>
+                      <th className="file-path-column">File Path</th>
+                      <th className="file-description-column">Description</th>
                       <th className="action-column">Action</th>
                     </tr>
                   </thead>
@@ -134,9 +217,12 @@ const App = () => {
                     {fileSources.map((source) => (
                       <tr key={source.id}>
                         <td className="id-column">{source.id}</td>
-                        <td className="url-column">{source.file}</td>
+                        <td className="file-name-column">{source.file_name}</td>
+                        <td className="file-path-column">{source.file_path}</td>
+                        <td className="file-description-column">{source.description}</td>
                         <td className="action-column">
                           <Button variant="danger" size="sm" onClick={() => deleteEntry('file', source.id)}>Delete</Button>
+                          <Button className="update-button" size="sm" onClick={() => handleShowModal('file', source)}>Update</Button>
                         </td>
                       </tr>
                     ))}
@@ -157,14 +243,14 @@ const App = () => {
                   value={searchFaq}
                   onChange={(e) => setSearchFaq(e.target.value)}
                 />
-                <Button variant="outline-success" onClick={() => searchEntries('faq', searchFaq)}>Search</Button>
               </Form>
               <div className="table-wrapper">
                 <Table responsive striped hover className="table-sm">
                   <thead className="thead-light">
                     <tr>
                       <th className="id-column">ID</th>
-                      <th className="url-column">FAQ</th>
+                      <th className="question-column">Question</th>
+                      <th className="answer-column">Answer</th>
                       <th className="action-column">Action</th>
                     </tr>
                   </thead>
@@ -172,9 +258,11 @@ const App = () => {
                     {faqSources.map((source) => (
                       <tr key={source.id}>
                         <td className="id-column">{source.id}</td>
-                        <td className="url-column">{source.faq}</td>
+                        <td className="question-column">{source.question}</td>
+                        <td className="answer-column">{source.answer}</td>
                         <td className="action-column">
                           <Button variant="danger" size="sm" onClick={() => deleteEntry('faq', source.id)}>Delete</Button>
+                          <Button className="update-button" size="sm" onClick={() => handleShowModal('faq', source)}>Update</Button>
                         </td>
                       </tr>
                     ))}
@@ -185,6 +273,111 @@ const App = () => {
           </Row>
         </Card.Body>
       </Card>
+
+      {/* Modal */}
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Update {modalType.charAt(0).toUpperCase() + modalType.slice(1)} Source</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {modalType === 'url' && (
+            <Form>
+              <Form.Group controlId="formUrl">
+                <Form.Label>URL</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={modalData.url || ''}
+                  onChange={(e) => setModalData({ ...modalData, url: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group controlId="formDescription">
+                <Form.Label>Description</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={modalData.description || ''}
+                  onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group controlId="formPaths">
+                <Form.Label>Paths</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={modalData.paths || ''}
+                  onChange={(e) => setModalData({ ...modalData, paths: e.target.value.split(', ') })}
+                />
+              </Form.Group>
+              <Form.Group controlId="formUpdatePeriod">
+                <Form.Label>Update Period</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={modalData.update_period || ''}
+                  onChange={(e) => setModalData({ ...modalData, update_period: e.target.value })}
+                >
+                  <option>Daily</option>
+                  <option>Weekly</option>
+                  <option>Monthly</option>
+                  <option>Quarterly</option>
+                </Form.Control>
+              </Form.Group>
+              <Form.Group controlId="formRecursive">
+                <Form.Check
+                  type="checkbox"
+                  label="Recursive"
+                  checked={modalData.recursive || false}
+                  onChange={(e) => setModalData({ ...modalData, recursive: e.target.checked })}
+                />
+              </Form.Group>
+            </Form>
+          )}
+          {modalType === 'file' && (
+            <Form>
+              <Form.Group controlId="formFileDescription">
+                <Form.Label>Description</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={modalData.description || ''}
+                  onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group controlId="formFile">
+                <Form.Label>Upload New File</Form.Label>
+                <Form.Control
+                  type="file"
+                  onChange={(e) => setModalData({ ...modalData, file: e.target.files[0] })}
+                />
+              </Form.Group>
+            </Form>
+          )}
+          {modalType === 'faq' && (
+            <Form>
+              <Form.Group controlId="formQuestion">
+                <Form.Label>Question</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={modalData.question || ''}
+                  onChange={(e) => setModalData({ ...modalData, question: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group controlId="formAnswer">
+                <Form.Label>Answer</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={modalData.answer || ''}
+                  onChange={(e) => setModalData({ ...modalData, answer: e.target.value })}
+                />
+              </Form.Group>
+            </Form>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleUpdate}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

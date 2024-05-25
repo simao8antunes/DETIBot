@@ -112,11 +112,10 @@ const MyForm = () => {
       });
       console.log('API response:', response.data);
       setLoading(false); // Set loading to false after response
-      //meter aqui mensagem de alerta que não foi possivel fazer o laod da fonte
-      if (response.data.response == 'Successfull'){
+      if (response.data.response === 'Successfull') {
         setSuccess(true); // Set success to true
         resetForm();
-      };
+      }
 
     } catch (error) {
       console.error('Error:', error);
@@ -138,6 +137,11 @@ const MyForm = () => {
     fileInputRef.current.value = '';
   };
 
+  const handleTabSelect = (key) => {
+    setSourceType(key);
+    setSuccess(false); // Reset success state when changing tabs
+  };
+
   return (
     <>
       <h2 className="text-center mb-4" style={{ fontFamily: 'Poppins, sans-serif', color: '#666', fontWeight: 'lighter', letterSpacing: '1px', lineHeight: '1.5', borderRadius: '10px', fontSize: '28px' }}>Loader</h2>
@@ -146,7 +150,7 @@ const MyForm = () => {
           <Tabs
             id="source-type-tabs"
             activeKey={sourceType}
-            onSelect={(key) => setSourceType(key)}
+            onSelect={handleTabSelect}
             className="mb-3"
           >
             <Tab eventKey="file" title="File">
@@ -171,10 +175,12 @@ const MyForm = () => {
                   />
                 </Form.Group>
                 <br />
-                <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }} disabled={loading}>
-                  {loading ? <Spinner animation="border" size="sm" /> : 'Submit'}
-                  {success && <span className="text-success ml-2"><FontAwesomeIcon icon={faCheck} /> Success</span>}
-                </Button>
+                <div className="d-flex align-items-center">
+                  <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }} disabled={loading}>
+                    {loading ? <Spinner animation="border" size="sm" /> : 'Submit'}
+                  </Button>
+                  {success && <span className="text-success ml-2">&nbsp;<FontAwesomeIcon icon={faCheck} /> Success</span>}
+                </div>
               </Form>
             </Tab>
             <Tab eventKey="url" title="URL">
@@ -254,10 +260,12 @@ const MyForm = () => {
                   </Form.Control>
                 </Form.Group>
                 <br />
-                <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }} disabled={loading}>
-                  {loading ? <Spinner animation="border" size="sm" /> : 'Submit'}
-                  {success && <span className="text-success ml-2"><FontAwesomeIcon icon={faCheck} /> Success</span>}
-                </Button>
+                <div className="d-flex align-items-center">
+                  <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }} disabled={loading}>
+                    {loading ? <Spinner animation="border" size="sm" /> : 'Submit'}
+                  </Button>
+                  {success && <span className="text-success ml-2">&nbsp;<FontAwesomeIcon icon={faCheck} /> Success</span>}
+                </div>
               </Form>
             </Tab>
             <Tab eventKey="qa" title="Q&A">
@@ -283,10 +291,12 @@ const MyForm = () => {
                   />
                 </Form.Group>
                 <br />
-                <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }} disabled={loading}>
-                  {loading ? <Spinner animation="border" size="sm" /> : 'Submit'}
-                  {success && <span className="text-success ml-2"><FontAwesomeIcon icon={faCheck} /> Success</span>}
-                </Button>
+                <div className="d-flex align-items-center">
+                  <Button variant="primary" type="submit" style={{ borderRadius: '10px', backgroundColor: '#1e90ff', border: 'none' }} disabled={loading}>
+                    {loading ? <Spinner animation="border" size="sm" /> : 'Submit'}
+                  </Button>
+                  {success && <span className="text-success ml-2">&nbsp;<FontAwesomeIcon icon={faCheck} /> Success</span>}
+                </div>
               </Form>
             </Tab>
           </Tabs>
