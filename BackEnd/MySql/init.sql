@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS url_child_source (
     id INT AUTO_INCREMENT PRIMARY KEY,
     url_link VARCHAR(255),
     parent_id INT,
-    FOREIGN KEY (parent_id) REFERENCES url_source (id)
+    FOREIGN KEY (parent_id) REFERENCES url_source (id) ON DELETE CASCADE
 );
 
 -- Creates source table

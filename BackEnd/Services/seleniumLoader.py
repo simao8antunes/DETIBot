@@ -1,6 +1,6 @@
 from langchain_core.documents import Document
 from langchain_community.document_loaders.url_selenium import SeleniumURLLoader
-from typing import List,Tuple
+from typing import List, Tuple
 import logging
 import time
 from urllib.parse import urlparse, urljoin
@@ -9,20 +9,20 @@ from bs4 import BeautifulSoup
 logger = logging.getLogger(__name__)
 
 class SeleniumURLLoaderWithWait(SeleniumURLLoader):
-    def load(self, wait_time: int = 3, recursive: bool = False, paths: List = []) -> Tuple[List[Document],set]:
+    def load(self, wait_time: int = 3, recursive: bool = False, paths: List = []) -> Tuple[List[Document], List[str]]:
         from unstructured.partition.html import partition_html
 
         start_time = time.time()
         docs: List[Document] = list()
         driver = self._get_driver()
         child_links = set()
-        visited_urls = set()
+        visited_urls = []
 
         def scrape_recursive(url):
             nonlocal driver
             try:
                 driver.get(url)
-                visited_urls.add(url)
+                visited_urls.append(url)
                 time.sleep(wait_time)
 
                 page_content = driver.page_source

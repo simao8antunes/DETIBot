@@ -13,8 +13,8 @@ import mysql.connector
 from langchain_community.docstore.base import Document
 
 
-QDRANT_URL = "http://localhost:6333" #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
-MYSQL_HOST = "localhost" #"mysqldb" <-docker || local -> "localhost"
+QDRANT_URL = "http://qdrantdb:6333" #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
+MYSQL_HOST = "mysqldb" #"mysqldb" <-docker || local -> "localhost"
 
 class QStore:  
 
@@ -147,7 +147,7 @@ class MySql:
         return {"response": True}
 
     def insert_child(self,childs:set):
-        parent = child[0]
+        parent = childs[0]
         parent_id = self.get("SELECT id FROM url_source WHERE url_link = %s",[parent])
         print(parent_id)
         for child in childs[1:]:

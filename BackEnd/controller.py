@@ -106,8 +106,19 @@ async def SourceFaq(source: Faq_Source):
 @app.delete("/detibot/delete_urlsource/{id}")
 async def deleteUrlSource(id: int):
     current_source = db.get("SELECT url_link FROM url_source WHERE id = %s",[id])
+
+    child_links = db.get("SELECT url_link FROM url_child_source WHERE parent_id = %s",[id])
+
     qstore.delete_vectors(current_source[0][0])
+    print(current_source[0][0])
+    for link in child_links:
+        print(link[0])
+        qstore.delete_vectors(link[0])
+
     db.delete_url_source(id)
+    print(current_source)
+    print(child_links)
+
 
 @app.delete("/detibot/delete_filesource/{id}")
 async def deleteFileSource(id: int):
