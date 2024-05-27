@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { DropdownButton, Dropdown, Spinner } from 'react-bootstrap';
 import '../ChatPage.css';
-import userAvatar from '../assets/user-avatar.jpg'; // Placeholder user avatar
-import botAvatar from '../assets/bot-avatar.jpg'; // Bot avatar
+import userAvatar from '../assets/pfp.jpg'; // Placeholder user avatar
+import botAvatar from '../assets/detibot.png'; // Bot avatar
 
 const API_ADDR = "localhost:8000";
 
@@ -102,38 +102,51 @@ const ChatPage = () => {
                 <Dropdown.Item onClick={() => handleLanguageChange('pt')}>Português</Dropdown.Item>
             </DropdownButton>
 
-            <h1 className="mb-4" style={{ fontFamily: 'Poppins, sans-serif', color: '#666', fontWeight: 'lighter' }}>{translateText('chatPageTitle')}</h1>
+            <div className="title-container mb-4" style={{ display: 'flex', alignItems: 'center' }}>
+                <img src={botAvatar} alt="DetiBot" className="detibot-image" />
+                <h1 style={{ fontFamily: 'Poppins, sans-serif', color: '#666', fontWeight: 'lighter' }}>{translateText('chatPageTitle')}</h1>
+            </div>
 
-            <div className="card shadow" style={{ borderRadius: '25px', backgroundColor: '#A1C0CC', border: 'none' }}>
+            <div className="card shadow" style={{ borderRadius: '25px', backgroundColor: '#61B3FB', border: 'none' }}>
 
                 <div className="card-body">
-                    
 
                     {/* Display chat messages */}
-                    <div className="chat-container" style={{backgroundColor: '#FFFFFF', maxHeight: '700px', overflowY: 'auto', height: '600px' }}>
+                    <div className="chat-container" style={{ backgroundColor: '#FFFFFF', maxHeight: '700px', overflowY: 'auto', height: '600px' }}>
                         {messages.map((message, index) => (
                             <div key={index} className={`message-wrapper ${message.isUser ? 'user-message' : 'api-message'}`}>
-                                <img 
-                                    src={message.isUser ? userAvatar : botAvatar} 
-                                    alt={message.isUser ? 'User' : 'Bot'} 
-                                    className="avatar" 
-                                    style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }}
-                                />
-                                <div className={`message-bubble ${message.isUser ? 'user-bubble' : 'api-bubble'}`}>
-                                    {message.text}
-                                </div>
+                                {message.isUser ? (
+                                    <div className="user-message-container">
+                                        <div className="message-bubble user-bubble">{message.text}</div>
+                                        <img
+                                            src={userAvatar}
+                                            alt="User"
+                                            className="avatar"
+                                            style={{ width: '40px', height: '40px', borderRadius: '50%', marginLeft: '10px' }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <>
+                                        <img
+                                            src={botAvatar}
+                                            alt="Bot"
+                                            className="avatar"
+                                            style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }}
+                                        />
+                                        <div className="message-bubble api-bubble">{message.text}</div>
+                                    </>
+                                )}
                             </div>
                         ))}
+                        {/* Loading spinner */}
+                        {loading && (
+                            <div className="spinner-container">
+                                <Spinner animation="border" role="status">
+                                    <span className="sr-only"></span>
+                                </Spinner>
+                            </div>
+                        )}
                     </div>
-
-                    {/* Loading spinner */}
-                    {loading && (
-                        <div className="text-center mt-3">
-                            <Spinner animation="border" role="status" style={{ color: '#FFFFFF' }}>
-                                <span className="sr-only"></span>
-                            </Spinner>
-                        </div>
-                    )}
 
                     {/* Chat input field and send button */}
                     <div className="input-group mt-3">
