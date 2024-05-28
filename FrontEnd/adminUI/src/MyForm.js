@@ -1,27 +1,28 @@
 import React, { useState, useRef } from 'react';
-import { Form, Button, Card, Row, Col, Tabs, Tab, Spinner } from 'react-bootstrap';
+import { Form, Button, Card, Row, Col, Tabs, Tab, Spinner, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 const MyForm = () => {
   const [sourceType, setSourceType] = useState('file');
-  const [file, setFile] = useState(null); // Using null instead of empty string for file
+  const [file, setFile] = useState(null);
   const [url, setUrl] = useState('');
   const [description, setDescription] = useState('');
   const [frequency, setFrequency] = useState('');
   const [recursive, setRecursive] = useState(false);
   const [pathsEnabled, setPathsEnabled] = useState(false);
   const [paths, setPaths] = useState([]);
-  const [loading, setLoading] = useState(false); // Loading state
-  const [success, setSuccess] = useState(false); // Success state
-  const [questions, setQuestions] = useState(''); // State for questions
-  const [answers, setAnswers] = useState(''); // State for answers
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [questions, setQuestions] = useState('');
+  const [answers, setAnswers] = useState('');
+  const [errors, setErrors] = useState({});
 
-  const fileInputRef = useRef(null); // Ref for file input
+  const fileInputRef = useRef(null);
 
   const handleFileChange = (event) => {
-    setFile(event.target.files[0]); // Set the file object directly
+    setFile(event.target.files[0]);
   };
 
   const handleUrlChange = (event) => {
@@ -70,8 +71,24 @@ const MyForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setLoading(true); // Set loading to true on submit
-    setSuccess(false); // Reset success state
+    setLoading(true);
+    setSuccess(false);
+    setErrors({});
+
+    // Validate fields
+    const newErrors = {};
+    if (sourceType === 'file' && !file) newErrors.file = 'File is required';
+    if (sourceType === 'file' && !description) newErrors.description = 'Description is required';
+    if (sourceType === 'url' && !url) newErrors.url = 'URL is required';
+    if (sourceType === 'url' && !description) newErrors.description = 'Description is required';
+    if (sourceType === 'url' && !frequency) newErrors.frequency = 'Frequency is required';
+    if (sourceType === 'qa' && !questions) newErrors.questions = 'Question is required';
+    if (sourceType === 'qa' && !answers) newErrors.answers = 'Answer is required';
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setLoading(false);
+      return;
+    }
 
     let apiUrl = '';
     let data;
@@ -100,46 +117,41 @@ const MyForm = () => {
       };
     }
 
-    console.log(sourceType);
-    console.log(data);
-    console.log(apiUrl);
-
     try {
       const response = await axios.post(apiUrl, data, {
         headers: {
           'Content-Type': sourceType === 'file' ? 'multipart/form-data' : 'application/json'
         }
       });
-      console.log('API response:', response.data);
-      setLoading(false); // Set loading to false after response
+      setLoading(false);
       if (response.data.response === 'Successfull') {
-        setSuccess(true); // Set success to true
+        setSuccess(true);
         resetForm();
+        setTimeout(() => setSuccess(false), 5000); // Hide success message after 5 seconds
       }
-
     } catch (error) {
       console.error('Error:', error);
-      setLoading(false); // Set loading to false if there's an error
-      setSuccess(false); // Reset success state in case of error
+      setLoading(false);
+      setSuccess(false);
     }
   };
 
   const resetForm = () => {
-    setFile(null); // Using null instead of empty string for file
+    setFile(null);
     setUrl('');
     setDescription('');
     setFrequency('');
     setRecursive(false);
     setPathsEnabled(false);
     setPaths([]);
-    setQuestions(''); // Reset questions
-    setAnswers(''); // Reset answers
+    setQuestions('');
+    setAnswers('');
     fileInputRef.current.value = '';
   };
 
   const handleTabSelect = (key) => {
     setSourceType(key);
-    setSuccess(false); // Reset success state when changing tabs
+    setSuccess(false);
   };
 
   return (
@@ -159,10 +171,11 @@ const MyForm = () => {
                   <Form.Label>Upload File:</Form.Label>
                   <Form.Control
                     type="file"
-                    ref={fileInputRef} // Assign ref to file input
+                    ref={fileInputRef}
                     onChange={handleFileChange}
-                    style={{ color: '#1e90ff' }}
+                    style={{ color: '#1e90ff', borderColor: errors.file ? 'red' : '' }}
                   />
+                  {errors.file && <Alert variant="danger">{errors.file}</Alert>}
                 </Form.Group>
                 <Form.Group controlId="description">
                   <Form.Label>Description:</Form.Label>
@@ -171,8 +184,9 @@ const MyForm = () => {
                     rows={3}
                     value={description}
                     onChange={handleDescriptionChange}
-                    style={{ borderRadius: '10px', color: '#1e90ff' }}
+                    style={{ borderRadius: '10px', color: '#1e90ff', borderColor: errors.description ? 'red' : '' }}
                   />
+                  {errors.description && <Alert variant="danger">{errors.description}</Alert>}
                 </Form.Group>
                 <br />
                 <div className="d-flex align-items-center">
@@ -192,8 +206,9 @@ const MyForm = () => {
                     placeholder="Enter URL"
                     value={url}
                     onChange={handleUrlChange}
-                    style={{ color: '#1e90ff' }}
+                    style={{ color: '#1e90ff', borderColor: errors.url ? 'red' : '' }}
                   />
+                  {errors.url && <Alert variant="danger">{errors.url}</Alert>}
                 </Form.Group>
                 <Form.Group controlId="recursive">
                   <Form.Check
@@ -241,8 +256,9 @@ const MyForm = () => {
                     rows={3}
                     value={description}
                     onChange={handleDescriptionChange}
-                    style={{ borderRadius: '10px', color: '#1e90ff' }}
+                    style={{ borderRadius: '10px', color: '#1e90ff', borderColor: errors.description ? 'red' : '' }}
                   />
+                  {errors.description && <Alert variant="danger">{errors.description}</Alert>}
                 </Form.Group>
                 <Form.Group controlId="frequency">
                   <Form.Label>Frequency of Updates:</Form.Label>
@@ -250,7 +266,7 @@ const MyForm = () => {
                     as="select"
                     value={frequency}
                     onChange={handleFrequencyChange}
-                    style={{ borderRadius: '10px', color: '#1e90ff' }}
+                    style={{ borderRadius: '10px', color: '#1e90ff', borderColor: errors.frequency ? 'red' : '' }}
                   >
                     <option value="">Select Frequency</option>
                     <option value="Daily">Daily</option>
@@ -258,6 +274,7 @@ const MyForm = () => {
                     <option value="Monthly">Monthly</option>
                     <option value="Quarterly">Quarterly</option>
                   </Form.Control>
+                  {errors.frequency && <Alert variant="danger">{errors.frequency}</Alert>}
                 </Form.Group>
                 <br />
                 <div className="d-flex align-items-center">
@@ -277,8 +294,9 @@ const MyForm = () => {
                     rows={3}
                     value={questions}
                     onChange={handleQuestionsChange}
-                    style={{ borderRadius: '10px', color: '#1e90ff' }}
+                    style={{ borderRadius: '10px', color: '#1e90ff', borderColor: errors.questions ? 'red' : '' }}
                   />
+                  {errors.questions && <Alert variant="danger">{errors.questions}</Alert>}
                 </Form.Group>
                 <Form.Group controlId="answers">
                   <Form.Label>Answers:</Form.Label>
@@ -287,8 +305,9 @@ const MyForm = () => {
                     rows={3}
                     value={answers}
                     onChange={handleAnswersChange}
-                    style={{ borderRadius: '10px', color: '#1e90ff' }}
+                    style={{ borderRadius: '10px', color: '#1e90ff', borderColor: errors.answers ? 'red' : '' }}
                   />
+                  {errors.answers && <Alert variant="danger">{errors.answers}</Alert>}
                 </Form.Group>
                 <br />
                 <div className="d-flex align-items-center">
