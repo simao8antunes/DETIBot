@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Form, FormControl, Container, Row, Col, Card, Modal } from 'react-bootstrap';
+import { Table, Button, Form, FormControl, Container, Row, Col, Card, Modal, Spinner } from 'react-bootstrap';
 import axios from 'axios';
-import debounce from 'lodash.debounce'; // Import debounce from lodash
-import './App.css'; // Import the custom CSS file
+import debounce from 'lodash.debounce';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import './App.css';
 
 const App = () => {
   const [urlSources, setUrlSources] = useState([]);
@@ -15,6 +17,9 @@ const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [modalData, setModalData] = useState({});
+  const [pathsEnabled, setPathsEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -41,10 +46,14 @@ const App = () => {
     };
 
     try {
+      setLoading(true);
       await axios.delete(endpoints[type]);
       fetchData();
+      setLoading(false);
+      showSuccessModalWithTimeout();
     } catch (error) {
       console.error('Error deleting entry', error);
+      setLoading(false);
     }
   };
 
@@ -93,9 +102,35 @@ const App = () => {
     setModalType(type);
     setModalData(data);
     setShowModal(true);
+    setPathsEnabled(data.paths && data.paths.length > 0);
   };
 
   const handleCloseModal = () => setShowModal(false);
+
+  const handlePathChange = (event, index) => {
+    const newPaths = [...modalData.paths];
+    newPaths[index] = event.target.value;
+    setModalData({ ...modalData, paths: newPaths });
+  };
+
+  const handleAddPath = () => {
+    setModalData({ ...modalData, paths: [...modalData.paths, ''] });
+  };
+
+  const handleRemovePath = (index) => {
+    const newPaths = [...modalData.paths];
+    newPaths.splice(index, 1);
+    setModalData({ ...modalData, paths: newPaths });
+  };
+
+  const handlePathsEnabledChange = () => {
+    setPathsEnabled(!pathsEnabled);
+    if (!pathsEnabled) {
+      setModalData({ ...modalData, paths: [''] });
+    } else {
+      setModalData({ ...modalData, paths: [] });
+    }
+  };
 
   const handleUpdate = async () => {
     const { id } = modalData;
@@ -106,6 +141,7 @@ const App = () => {
     };
 
     try {
+      setLoading(true);
       if (modalType === 'url') {
         const updateData = {
           ...modalData,
@@ -132,9 +168,19 @@ const App = () => {
       }
       fetchData();
       handleCloseModal();
+      setLoading(false);
+      showSuccessModalWithTimeout();
     } catch (error) {
       console.error(`Error updating ${modalType} entry`, error);
+      setLoading(false);
     }
+  };
+
+  const showSuccessModalWithTimeout = () => {
+    setShowSuccessModal(true);
+    setTimeout(() => {
+      setShowSuccessModal(false);
+    }, 1000);
   };
 
   return (
@@ -298,14 +344,34 @@ const App = () => {
                   onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
                 />
               </Form.Group>
-              <Form.Group controlId="formPaths">
-                <Form.Label>Paths</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={modalData.paths || ''}
-                  onChange={(e) => setModalData({ ...modalData, paths: e.target.value.split(', ') })}
+              <Form.Group controlId="formPathsEnabled">
+                <Form.Check
+                  type="switch"
+                  label="Enable Paths"
+                  checked={pathsEnabled}
+                  onChange={handlePathsEnabledChange}
                 />
               </Form.Group>
+              {pathsEnabled && (
+                <>
+                  {modalData.paths && modalData.paths.map((path, index) => (
+                    <Row key={index} className="mb-2">
+                      <Col>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter path"
+                          value={path}
+                          onChange={(event) => handlePathChange(event, index)}
+                        />
+                      </Col>
+                      <Col xs="auto">
+                        <Button variant="danger" onClick={() => handleRemovePath(index)}>Remove</Button>
+                      </Col>
+                    </Row>
+                  ))}
+                  <Button variant="primary" onClick={handleAddPath}>Add Path</Button>
+                </>
+              )}
               <Form.Group controlId="formUpdatePeriod">
                 <Form.Label>Update Period</Form.Label>
                 <Form.Control
@@ -375,8 +441,19 @@ const App = () => {
           </Button>
           <Button variant="primary" onClick={handleUpdate}>
             Save Changes
+            {loading && <Spinner animation="border" size="sm" className="ms-2" />}
           </Button>
         </Modal.Footer>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)} centered>
+        <Modal.Body className="text-center">
+          <h4 className="text-success">
+            <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
+            Success!
+          </h4>
+        </Modal.Body>
       </Modal>
     </Container>
   );
