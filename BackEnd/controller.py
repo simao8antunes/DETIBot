@@ -1,9 +1,11 @@
+from typing import List
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import shutil
+from pydantic import BaseModel
 
-from Services import Query,Loading,MySql,URL_Source,File_Source,QStore,Faq_Source
+from Services import Query,Loading,MySql,URL_Source,File_Source,QStore,Faq_Source,Question
 
 
 app = FastAPI()
@@ -21,19 +23,22 @@ app.add_middleware(
     allow_headers=["*"]  # Allows all headers
 )
 
+
+
+
 @app.get("/detibot")
 async def root():
     return "This is the api for DETIBOT"
 #---------------------- endpoints that returns an answer given a prompt--------------------------- 
-@app.get("/detibot/en/{prompt}")
-async def QuestionEn(prompt: str):
-   reposta = procurador.queries(prompt,"en")
-   return reposta["query"]
+@app.post("/detibot/en")
+async def QuestionEn(payload: Question):
+    response = procurador.queries(payload.prompt, "pt", payload.chat)
+    return response["query"]
 
-@app.get("/detibot/pt/{prompt}")
-async def QuestionPt(prompt: str):
-   reposta = procurador.queries(prompt,"pt")
-   return reposta["query"]
+@app.post("/detibot/pt")
+async def QuestionPt(payload: Question):
+    response = procurador.queries(payload.prompt, "pt", payload.chat)
+    return response["query"]
 
 #-------------------------enpoints that list every row of a table in mysql--------------------------
 @app.get("/detibot/url_sources")
@@ -137,8 +142,6 @@ async def deleteFileSource(id: int):
         return {"detail": "File deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting file: {e}")
-
-    #falta dar delete na pasta do uploads
 
 @app.delete("/detibot/delete_faqsource/{id}")
 async def deleteFaqSource(id: int):

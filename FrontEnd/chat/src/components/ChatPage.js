@@ -12,6 +12,7 @@ const ChatPage = () => {
     const [newMessage, setNewMessage] = useState(''); // State for the current input
     const [language, setLanguage] = useState('en'); // State for the selected language
     const [loading, setLoading] = useState(false); // State for loading indicator
+    const [history, setHistory] = useState([]); // State for storing the conversation history
 
     // Function to handle sending a new message
     const handleSendMessage = async () => {
@@ -24,6 +25,7 @@ const ChatPage = () => {
 
             // Add the user's message to the list of messages
             setMessages((prevMessages) => [...prevMessages, userMessage]);
+            setHistory((prevHistory) => [...prevHistory, newMessage]);
 
             // Clear the input field
             setNewMessage('');
@@ -33,8 +35,11 @@ const ChatPage = () => {
 
             // Send the user's message to the API and handle the response
             try {
-                const url = `http://${API_ADDR}/detibot/${language}/${encodeURIComponent(newMessage)}`;
-                const response = await axios.get(url);
+                const url = `http://${API_ADDR}/detibot/${language}`;
+                const response = await axios.post(url, {
+                    prompt: newMessage,
+                    chat: history
+                });
 
                 // Handle the API response
                 if (response.data) {
@@ -44,6 +49,9 @@ const ChatPage = () => {
                     };
                     // Add the API response to the list of messages
                     setMessages((prevMessages) => [...prevMessages, apiResponse]);
+                    
+                    // Update the conversation history
+                    setHistory((prevHistory) => [...prevHistory, response.data ]);
                 }
             } catch (error) {
                 console.error('Error sending message to API:', error);
@@ -90,7 +98,6 @@ const ChatPage = () => {
 
     return (
         <div className="container mt-4">
-
             {/* Language dropdown button */}
             <DropdownButton
                 id="languageDropdown"
@@ -108,9 +115,7 @@ const ChatPage = () => {
             </div>
 
             <div className="card shadow" style={{ borderRadius: '25px', backgroundColor: '#61B3FB', border: 'none' }}>
-
                 <div className="card-body">
-
                     {/* Display chat messages */}
                     <div className="chat-container" style={{ backgroundColor: '#FFFFFF', maxHeight: '700px', overflowY: 'auto', height: '600px' }}>
                         {messages.map((message, index) => (

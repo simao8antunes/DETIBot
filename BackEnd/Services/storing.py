@@ -268,8 +268,35 @@ class MySql:
             print(f"Error executing query: {e}")
 
     def update_url_source(self, id, source):
-        self.delete_url_source(id)
-        return self.insert_source(source)
+        self.delete_url_child_source(id)
+        q = """
+        UPDATE url_source 
+        SET url_link = %s, paths = %s, descript = %s, wait_time = %s, recursive_url = %s, update_period_id = %s 
+        WHERE id = %s
+        """
+        update_period_id = 0
+        if source.update_period == "Daily":
+            update_period_id = 1
+        elif source.update_period == 'Weekly':
+            update_period_id = 2
+        elif source.update_period == 'Monthly':
+            update_period_id = 3
+        elif source.update_period == 'Quarterly':
+            update_period_id = 4
+        
+        try:
+            self.cursor.execute(q, (source.url, ','.join(source.paths), source.description, source.wait_time, source.recursive, update_period_id, id))
+            self.conn.commit()
+            if self.cursor.rowcount == 0:
+                return {"error": "ID not found"}
+        except mysql.connector.Error as e:
+            error_message = str(e)
+            if "Duplicate entry" in error_message:
+                return {"response": "This value already exists"}
+            else:
+                print("Error inserting to MySQL:", e)
+                return {"response": "Error inserting to MySQL: " + str(e)}
+        return {"response": True}
 
 # FILE_SOURCE        
     def list_file_sources(self):

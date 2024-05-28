@@ -16,3 +16,7 @@ class File_Source(BaseModel): # classe q define as fontes de conhecimento para d
 class Faq_Source(BaseModel): # classe q define as fontes de conhecimento para dps serem guardadas na bd
     question: str
     answer: str
+
+class Question(BaseModel):
+    prompt: str
+    chat: list[str]
