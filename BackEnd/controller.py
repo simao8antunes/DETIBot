@@ -152,14 +152,25 @@ async def updateUrlSource(id: int,source: URL_Source):
     print(source.paths)
     current_source = db.get("SELECT url_link FROM url_source WHERE id = %s",[id])
 
-    child_links = db.get("SELECT url_link FROM url_child_source WHERE parent_id = %s",[id])
+    if current_source:
 
-    qstore.delete_vectors(current_source[0][0])
-    for link in child_links:
-        qstore.delete_vectors(link[0])
+        child_links = db.get("SELECT url_link FROM url_child_source WHERE parent_id = %s",[id])
 
-    db.update_url_source(id, source)
-    load.url_loader(source)
+        qstore.delete_vectors(current_source[0][0])
+        if child_links:
+            for link in child_links:
+                qstore.delete_vectors(link[0])
+
+        db.update_url_source(id, source)
+        return load.url_loader(source)
+    else:
+        response = db.insert_source(source)
+        if response["response"] is True:
+            #loads the new source object
+            return load.url_loader(source)
+        else:
+            return response   
+
 
 @app.put("/detibot/update_filesource/{id}")
 async def updateFileSource(id: int,file: UploadFile = File(...), descript: str = Form(...)):
