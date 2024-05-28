@@ -258,6 +258,14 @@ class MySql:
             self.conn.commit()
         except mysql.connector.Error as e:
             print(f"Error executing query: {e}")
+    
+    def delete_url_child_source(self, id):
+        q = "DELETE FROM url_child_source WHERE parent_id = %s"
+        try:
+            self.cursor.execute(q, (id,))
+            self.conn.commit()
+        except mysql.connector.Error as e:
+            print(f"Error executing query: {e}")
 
     def update_url_source(self, id, source):
         self.delete_url_source(id)
