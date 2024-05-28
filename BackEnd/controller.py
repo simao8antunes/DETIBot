@@ -83,6 +83,7 @@ async def SourceFile(file: UploadFile = File(...), descript: str = Form(...)):
 @app.post("/detibot/insert_urlsource")
 async def SourceUrl(source: URL_Source):
     #inserts the source object into the db
+    print(source.paths)
     response = db.insert_source(source)
     if response["response"] is True:
         #loads the new source object
@@ -148,8 +149,15 @@ async def deleteFaqSource(id: int):
 #------------------------ endpoints to update sources in the system------------------------------
 @app.put("/detibot/update_urlsource/{id}")
 async def updateUrlSource(id: int,source: URL_Source):
+    print(source.paths)
     current_source = db.get("SELECT url_link FROM url_source WHERE id = %s",[id])
+
+    child_links = db.get("SELECT url_link FROM url_child_source WHERE parent_id = %s",[id])
+
     qstore.delete_vectors(current_source[0][0])
+    for link in child_links:
+        qstore.delete_vectors(link[0])
+
     db.update_url_source(id, source)
     load.url_loader(source)
 

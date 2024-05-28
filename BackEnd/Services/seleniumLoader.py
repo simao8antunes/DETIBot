@@ -26,15 +26,25 @@ class SeleniumURLLoaderWithWait(SeleniumURLLoader):
                 time.sleep(wait_time)
 
                 page_content = driver.page_source
+                soup = BeautifulSoup(page_content, 'html.parser')
+
+                lixos = soup.find_all(['nav', 'footer']) 
+                for l in lixos:
+                    l.decompose()
+                cookies = soup.find_all('div', id='onetrust-consent-sdk') 
+                for cookie in cookies:
+                    cookie.decompose()
+                
+                page_content = soup.encode_contents().decode('utf-8')
                 elements = partition_html(text=page_content)
-                text = "\n\n".join([str(el) for el in elements])
+                text = "   ".join([str(el) for el in elements])
                 metadata = self._build_metadata(url, driver)
                 docs.append(Document(page_content=text, metadata=metadata))
                 print(url)
 
                 # Get links
                 base_url = urlparse(url)
-                soup = BeautifulSoup(page_content, 'html.parser')
+                
                 links = [link.get('href') for link in soup.find_all('a')]
                 if '/curso/' in base_url.path: 
                     course_id = base_url.path.split('/')[-1]
