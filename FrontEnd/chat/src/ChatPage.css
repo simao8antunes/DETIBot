@@ -1,5 +1,3 @@
-/* ChatPage.css */
-
 /* Style for the message wrapper */
 .message-wrapper {
     display: flex;
@@ -22,6 +20,8 @@
     background-color: #007bff;
     color: #fff;
     margin-left: 10px; /* Adds space between the message bubble and the avatar */
+    white-space: pre-wrap; /* Allows breaking text to wrap onto the next line */
+    word-break: break-word; /* Breaks long words onto the next line */
 }
 
 /* Style for the API message */
@@ -32,13 +32,15 @@
     background-color: #e9ecef;
     color: #333;
     margin-right: 10px; /* Adds space between the message bubble and the avatar */
+    white-space: pre-wrap; /* Allows breaking text to wrap onto the next line */
+    word-break: break-word; /* Breaks long words onto the next line */
 }
 
 /* Style for the message bubble */
 .message-bubble {
     padding: 10px 20px;
     border-radius: 20px;
-    max-width: 60%;
+    max-width: calc(100% - 10px); /* Adjust max-width to prevent overflow */
 }
 
 /* Style for the spinner container */
@@ -90,6 +92,6 @@
 /* Media query for responsive design */
 @media (max-width: 576px) {
     .message-bubble {
-        max-width: 80%;
+        max-width: calc(100% - 60px);
     }
 }
