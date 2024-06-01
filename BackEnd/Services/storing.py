@@ -13,8 +13,8 @@ import mysql.connector
 from langchain_community.docstore.base import Document
 
 
-QDRANT_URL = "http://qdrantdb:6333" #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
-MYSQL_HOST = "mysqldb" #"mysqldb" <-docker || local -> "localhost"
+QDRANT_URL = "http://localhost:6333" #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
+MYSQL_HOST = "localhost" #"mysqldb" <-docker || local -> "localhost"
 
 class QStore:  
 

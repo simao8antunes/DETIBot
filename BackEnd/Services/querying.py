@@ -23,7 +23,7 @@ class Query:
         history = ""
         count = 0
         for message in chat_history:
-            history += f"message_id: {count}, message: {message}"
+            history += f"message_id: {count}, message: {message}\n"
             count += 1
         return history
 
@@ -71,7 +71,8 @@ class Query:
         chain = create_retrieval_chain(retriever, qa_chain)
         input_data = {
             'input': question,
-            'history': history  # add history to input data
+            'history': history,  # add history to input data
+            'context': ""
         }
         text = chain.invoke(input_data)
         print(text)
