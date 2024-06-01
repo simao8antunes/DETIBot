@@ -22,7 +22,7 @@ class Loading:
     def url_loader(self, source: URL_Source):
         documents,childs=self.load_urls(source)
         if source.recursive:
-            db.insert_child(childs)
+            db.insert_child(childs,source.url)
         indexer.index(documents)
         return {"response": "Successfull"}
     
