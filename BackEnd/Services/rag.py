@@ -43,13 +43,13 @@ class Rag:
         index = Qdrant.from_documents(
             chunks,
             embedding=self.embeddings,
-            url="http://localhost:6333", #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
+            url="http://qdrantdb:6333", #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
             collection_name="db"
         )
         index.client.close()
 
     def query(self, question):
-        client = QdrantClient(url="http://localhost:6333") #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
+        client = QdrantClient(url="http://qdrantdb:6333") #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
         self.vector_store = Qdrant(client=client,embeddings=self.embeddings,collection_name="db")
         retriever = self.vector_store.as_retriever()
 

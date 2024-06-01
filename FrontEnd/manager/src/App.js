@@ -20,6 +20,7 @@ const App = () => {
   const [pathsEnabled, setPathsEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -46,6 +47,7 @@ const App = () => {
     };
 
     try {
+      setDeletingId(id);
       setLoading(true);
       await axios.delete(endpoints[type]);
       fetchData();
@@ -54,6 +56,8 @@ const App = () => {
     } catch (error) {
       console.error('Error deleting entry', error);
       setLoading(false);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -208,7 +212,7 @@ const App = () => {
                 <Table responsive striped hover className="table-sm url-table">
                   <thead className="thead-light">
                     <tr>
-                      <th className="id-column">ID</th>
+                      <th className="id-column">&nbsp;&nbsp;ID</th>
                       <th className="url-column">URL</th>
                       <th className="description-column">Description</th>
                       <th className="paths-column">Paths</th>
@@ -219,13 +223,15 @@ const App = () => {
                   <tbody>
                     {urlSources.map((source) => (
                       <tr key={source.id}>
-                        <td className="id-column">{source.id}</td>
+                        <td className="id-column">&nbsp;&nbsp;{source.id}</td>
                         <td className="url-column">{source.url}</td>
                         <td className="description-column">{source.description}</td>
                         <td className="paths-column">{source.paths.join(', ')}</td>
                         <td className="update-period-column">{source.update_period}</td>
                         <td className="action-column">
-                          <Button variant="danger" size="sm" onClick={() => deleteEntry('url', source.id)}>Delete</Button>
+                          <Button variant="danger" size="sm" onClick={() => deleteEntry('url', source.id)}>
+                            {deletingId === source.id ? 'Deleting...' : 'Delete'}
+                          </Button>
                           <Button className="update-button" size="sm" onClick={() => handleShowModal('url', source)}>Update</Button>
                         </td>
                       </tr>
@@ -252,7 +258,7 @@ const App = () => {
                 <Table responsive striped hover className="table-sm">
                   <thead className="thead-light">
                     <tr>
-                      <th className="id-column">ID</th>
+                      <th className="id-column">&nbsp;&nbsp;ID</th>
                       <th className="file-name-column">File Name</th>
                       <th className="file-path-column">File Path</th>
                       <th className="file-description-column">Description</th>
@@ -262,12 +268,14 @@ const App = () => {
                   <tbody>
                     {fileSources.map((source) => (
                       <tr key={source.id}>
-                        <td className="id-column">{source.id}</td>
+                        <td className="id-column">&nbsp;&nbsp;{source.id}</td>
                         <td className="file-name-column">{source.file_name}</td>
                         <td className="file-path-column">{source.file_path}</td>
                         <td className="file-description-column">{source.description}</td>
                         <td className="action-column">
-                          <Button variant="danger" size="sm" onClick={() => deleteEntry('file', source.id)}>Delete</Button>
+                          <Button variant="danger" size="sm" onClick={() => deleteEntry('file', source.id)}>
+                            {deletingId === source.id ? 'Deleting...' : 'Delete'}
+                          </Button>
                           <Button className="update-button" size="sm" onClick={() => handleShowModal('file', source)}>Update</Button>
                         </td>
                       </tr>
@@ -294,7 +302,7 @@ const App = () => {
                 <Table responsive striped hover className="table-sm">
                   <thead className="thead-light">
                     <tr>
-                      <th className="id-column">ID</th>
+                      <th className="id-column">&nbsp;&nbsp;ID</th>
                       <th className="question-column">Question</th>
                       <th className="answer-column">Answer</th>
                       <th className="action-column">Action</th>
@@ -303,11 +311,13 @@ const App = () => {
                   <tbody>
                     {faqSources.map((source) => (
                       <tr key={source.id}>
-                        <td className="id-column">{source.id}</td>
+                        <td className="id-column">&nbsp;&nbsp;{source.id}</td>
                         <td className="question-column">{source.question}</td>
                         <td className="answer-column">{source.answer}</td>
                         <td className="action-column">
-                          <Button variant="danger" size="sm" onClick={() => deleteEntry('faq', source.id)}>Delete</Button>
+                          <Button variant="danger" size="sm" onClick={() => deleteEntry('faq', source.id)}>
+                            {deletingId === source.id ? 'Deleting...' : 'Delete'}
+                          </Button>
                           <Button className="update-button" size="sm" onClick={() => handleShowModal('faq', source)}>Update</Button>
                         </td>
                       </tr>
