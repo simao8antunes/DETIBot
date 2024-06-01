@@ -39,7 +39,7 @@ for i in result_time_table:
             load.url_loader(fonte)
 
 for i in result_time_table:
-    logging.debug("Refresh the date of the update_time table where id=%s, result: %s; %s",i[0],db.update_time(i[0]),datetime.now())
+    logging.debug("Refresh the date of the update_time table where id=%s, result: %s",i[0],db.update_time(i[0]))
 
 logging.debug("Update process finished")
 
