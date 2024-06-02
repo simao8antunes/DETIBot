@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { DropdownButton, Dropdown, Spinner } from 'react-bootstrap';
+import { FaThumbsUp } from 'react-icons/fa';
 import '../ChatPage.css';
 import userAvatar from '../assets/pfp.jpg'; // Placeholder user avatar
 import botAvatar from '../assets/detibot.png'; // Bot avatar
@@ -51,7 +52,7 @@ const ChatPage = () => {
                     setMessages((prevMessages) => [...prevMessages, apiResponse]);
                     
                     // Update the conversation history
-                    setHistory((prevHistory) => [...prevHistory, response.data ]);
+                    setHistory((prevHistory) => [...prevHistory, response.data]);
                 }
             } catch (error) {
                 console.error('Error sending message to API:', error);
@@ -94,6 +95,20 @@ const ChatPage = () => {
 
         // Return the translated text based on the selected language
         return translations[language][text];
+    };
+
+    // Function to handle thumbs up click
+    const handleThumbsUp = async (question, answer) => {
+        try {
+            const apiUrl = 'http://localhost:8000/detibot/insert_faqsource';
+            const data = {
+                question: question,
+                answer: answer
+            };
+            await axios.post(apiUrl, data);
+        } catch (error) {
+            console.error('Error sending thumbs up data to API:', error);
+        }
     };
 
     return (
@@ -139,6 +154,10 @@ const ChatPage = () => {
                                             style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }}
                                         />
                                         <div className="message-bubble api-bubble">{message.text}</div>
+                                        <FaThumbsUp
+                                            style={{ cursor: 'pointer', marginLeft: '10px', color: '#007bff' }}
+                                            onClick={() => handleThumbsUp(history[history.length - 2], message.text)}
+                                        />
                                     </>
                                 )}
                             </div>
