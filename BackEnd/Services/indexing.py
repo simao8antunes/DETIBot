@@ -5,7 +5,6 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from Services.storing import QStore
 
 qstore = QStore()
-#rag = Rag()
 class Indexing:
 
     def __init__(self,size=256,overlap=25):

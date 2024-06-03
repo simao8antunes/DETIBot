@@ -63,7 +63,7 @@ services:
         - ollama_data:/root/.ollama
 
     chat:
-      build: ./chat
+      build: ./FrontEnd/chat
       image: chat
       container_name: chat
       ports:
@@ -75,11 +75,23 @@ services:
       #  - api
 
     admin:
-      build: ./adminUI
+      build: ./FrontEnd/adminUI
       image: admin
       container_name: admin
       ports:
         - "3010:3010"
+      volumes:
+        - .:/app
+      stdin_open: true
+      #depends_on:
+      #  - api
+
+    manager:
+      build: ./FrontEnd/manager
+      image: manager
+      container_name: manager
+      ports:
+        - "3020:3020"
       volumes:
         - .:/app
       stdin_open: true
