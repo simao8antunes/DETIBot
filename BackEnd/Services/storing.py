@@ -57,7 +57,7 @@ class QStore:
         retriever = self.vector_store.as_retriever()
         return retriever, client
     
-    def delete_vectors(self, payload_source="./Data/info.pdf"):
+    def delete_vectors(self, payload_source):
         client = QdrantClient(url=QDRANT_URL)
         if client.collection_exists(collection_name="db"):
             delete_filter=Filter(

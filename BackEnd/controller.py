@@ -81,14 +81,17 @@ async def SourceFile(file: UploadFile = File(...), descript: str = Form(...)):
         
         with open(file_location, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-        return load.file_loader(source)
+        
+        load_response = load.file_loader(source)
+        os.remove(file_location)
+
+        return load_response
     else:
         return response   
 
 @app.post("/detibot/insert_urlsource")
 async def SourceUrl(source: URL_Source):
     #inserts the source object into the db
-    print(source.paths)
     response = db.insert_source(source)
     if response["response"] is True:
         #loads the new source object
@@ -116,32 +119,21 @@ async def deleteUrlSource(id: int):
     child_links = db.get("SELECT url_link FROM url_child_source WHERE parent_id = %s",[id])
 
     qstore.delete_vectors(current_source[0][0])
-    print(current_source[0][0])
     for link in child_links:
-        print(link[0])
         qstore.delete_vectors(link[0])
 
     db.delete_url_source(id)
-    print(current_source)
-    print(child_links)
 
 
 @app.delete("/detibot/delete_filesource/{id}")
 async def deleteFileSource(id: int):
     current_source = db.get("SELECT file_path FROM file_source WHERE id = %s",[id])
     
-    if not os.path.exists(current_source[0][0]):
-        qstore.delete_vectors(current_source[0][0])
-        db.delete_file_source(id)
-        raise HTTPException(status_code=404, detail="File not found")
-    
-    try:
-        os.remove(current_source[0][0])
-        qstore.delete_vectors(current_source[0][0])
-        db.delete_file_source(id)
-        return {"detail": "File deleted successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error deleting file: {e}")
+    if not current_source:
+        raise HTTPException(status_code=404, detail="File source not found")
+    qstore.delete_vectors(current_source[0][0])
+    db.delete_file_source(id)
+    return {"detail": "File deleted successfully"}
 
 @app.delete("/detibot/delete_faqsource/{id}")
 async def deleteFaqSource(id: int):
@@ -152,7 +144,6 @@ async def deleteFaqSource(id: int):
 #------------------------ endpoints to update sources in the system------------------------------
 @app.put("/detibot/update_urlsource/{id}")
 async def updateUrlSource(id: int,source: URL_Source):
-    print(source.paths)
     current_source = db.get("SELECT url_link FROM url_source WHERE id = %s",[id])
 
     if current_source:
@@ -184,9 +175,7 @@ async def updateFileSource(id: int,file: UploadFile = File(...), descript: str =
     if not current_source:
         raise HTTPException(status_code=404, detail="File source not found")
 
-    if os.path.exists(current_source[0][0]):
-        os.remove(current_source[0][0])
-        qstore.delete_vectors(current_source[0][0])
+    qstore.delete_vectors(current_source[0][0])
     
     file_location = os.path.join(UPLOAD_FOLDER, file.filename)
     with open(file_location, "wb") as buffer:
@@ -194,7 +183,9 @@ async def updateFileSource(id: int,file: UploadFile = File(...), descript: str =
 
     updated_source = File_Source(file_name=file.filename,file_path=file_location,loader_type=file.content_type,description=descript)
     db.update_file_source(id, updated_source)
-    load.file_loader(updated_source)
+    loader_response = load.file_loader(updated_source)
+    os.remove(file_location)
+    return loader_response
 
 @app.put("/detibot/update_faqsource/{id}")
 async def updateFaqSource(id: int,source: Faq_Source):

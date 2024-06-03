@@ -33,13 +33,17 @@ for i in result_time_table:
                     qd.delete_vectors(link[0])
                 db.delete_url_child_source(item[0])
 
-            link_paths = item[2].split(',')
-            logging.debug(f"[URL]: {item[1]},[paths]: {link_paths},[period]]: {item[3]},[descpr]: {item[4]},[wait]: {item[5]},[recur]: {bool(item[6])}")
-            fonte = URL_Source(url=item[1],paths=link_paths,update_period=item[3],description=str(item[4]),wait_time=item[5],recursive=bool(item[6]))
+            if item[2] == '':
+                link_paths = []
+            else:    
+                link_paths = item[2].split(',')
+
+            logging.info(f"[URL]: {item[1]},[paths]: {link_paths},[period]]: {item[6]},[descpr]: {item[3]},[wait]: {item[4]},[recur]: {bool(item[5])}")
+            fonte = URL_Source(url=item[1],paths=link_paths,update_period=item[6],description=str(item[3]),wait_time=item[4],recursive=bool(item[5]))
             load.url_loader(fonte)
 
 for i in result_time_table:
-    logging.debug("Refresh the date of the update_time table where id=%s, result: %s",i[0],db.update_time(i[0]))
+    logging.info("Refresh the date of the update_time table where id=%s, result: %s",i[0],db.update_time(i[0]))
 
-logging.debug("Update process finished")
+logging.info("Update process finished")
 

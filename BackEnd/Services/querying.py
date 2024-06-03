@@ -5,7 +5,6 @@
 
 from langchain_community.llms.ollama import Ollama
 from langchain_core.prompts import PromptTemplate
-from langchain.chains.retrieval_qa.base import RetrievalQA
 import textwrap
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains.retrieval import create_retrieval_chain
@@ -17,7 +16,7 @@ qstore = QStore()
 class Query: 
 
     def __init__(self):
-        self.llm = Ollama(model="llama3", temperature=0) # ,base_url="http://ollama:11434" <- docker || local -> sem o ,base_url="http://ollama:11434"
+        self.llm = Ollama(model="llama3", temperature=0,base_url="http://ollama:11434") # ,base_url="http://ollama:11434" <- docker || local -> sem o ,base_url="http://ollama:11434"
         
     def format_history(self, chat_history):
         history = ""

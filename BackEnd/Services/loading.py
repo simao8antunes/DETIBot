@@ -10,13 +10,10 @@ from Services.storing import MySql
 from langchain_community.document_loaders.pdf import PyPDFLoader
 from langchain_community.document_loaders import Docx2txtLoader, CSVLoader, JSONLoader, UnstructuredHTMLLoader, TextLoader
 
-import os
 from Services.seleniumLoader import SeleniumURLLoaderWithWait as urlLoader
 
 db = MySql()
 indexer = Indexing()
-PDF_PATH = "./Data"
-
 class Loading:
 
     def url_loader(self, source: URL_Source):
@@ -42,28 +39,28 @@ class Loading:
         indexer.index(documents)
         return {"response": "Successfull"}
     
-    def load_csv(self, source):
+    def load_csv(self, source:File_Source):
         loader = CSVLoader(file_path=source.file_path)
         return loader.load()
     
-    def load_docx(self, source):
+    def load_docx(self, source:File_Source):
         #%pip install --upgrade --quiet  docx2txt
         loader = Docx2txtLoader(file_path=source.file_path)
         return loader.load()
     
-    def load_json(self, source):
+    def load_json(self, source:File_Source):
         loader = JSONLoader(file_path=source.file_path)##ver documentaçao para ver se é assim
         return loader.load()
     
-    def load_html(self, source):
+    def load_html(self, source:File_Source):
         loader = UnstructuredHTMLLoader(file_path=source.file_path)
         return loader.load()
     
-    def load_text(self, source):
+    def load_text(self, source:File_Source):
         loader = TextLoader(file_path=source.file_path)
         return loader.load()
     
-    def load_pdf(self, source):
+    def load_pdf(self, source:File_Source):
         loader = PyPDFLoader(file_path=source.file_path)
         return loader.load()
     
