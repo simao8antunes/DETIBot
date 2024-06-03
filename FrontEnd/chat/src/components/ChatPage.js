@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { DropdownButton, Dropdown, Spinner } from 'react-bootstrap';
-import { FaThumbsUp } from 'react-icons/fa';
+import { FaThumbsUp, FaRegThumbsUp } from 'react-icons/fa'; // Import the filled and regular thumbs up icons
 import '../ChatPage.css';
 import userAvatar from '../assets/pfp.jpg'; // Placeholder user avatar
 import botAvatar from '../assets/detibot.png'; // Bot avatar
@@ -14,6 +14,7 @@ const ChatPage = () => {
     const [language, setLanguage] = useState('en'); // State for the selected language
     const [loading, setLoading] = useState(false); // State for loading indicator
     const [history, setHistory] = useState([]); // State for storing the conversation history
+    const [thumbsUp, setThumbsUp] = useState({}); // State for tracking thumbs up status
 
     // Function to handle sending a new message
     const handleSendMessage = async () => {
@@ -98,7 +99,7 @@ const ChatPage = () => {
     };
 
     // Function to handle thumbs up click
-    const handleThumbsUp = async (question, answer) => {
+    const handleThumbsUp = async (index, question, answer) => {
         try {
             const apiUrl = 'http://localhost:8000/detibot/insert_faqsource';
             const data = {
@@ -106,6 +107,12 @@ const ChatPage = () => {
                 answer: answer
             };
             await axios.post(apiUrl, data);
+
+            // Toggle the thumbs up state for the given message index
+            setThumbsUp((prevThumbsUp) => ({
+                ...prevThumbsUp,
+                [index]: !prevThumbsUp[index]
+            }));
         } catch (error) {
             console.error('Error sending thumbs up data to API:', error);
         }
@@ -154,10 +161,17 @@ const ChatPage = () => {
                                             style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }}
                                         />
                                         <div className="message-bubble api-bubble">{message.text}</div>
-                                        <FaThumbsUp
-                                            style={{ cursor: 'pointer', marginLeft: '10px', color: '#007bff' }}
-                                            onClick={() => handleThumbsUp(history[history.length - 2], message.text)}
-                                        />
+                                        {thumbsUp[index] ? (
+                                            <FaThumbsUp
+                                                style={{ cursor: 'pointer', marginLeft: '10px', color: '#007bff' }}
+                                                onClick={() => handleThumbsUp(index, history[history.length - 2], message.text)}
+                                            />
+                                        ) : (
+                                            <FaRegThumbsUp
+                                                style={{ cursor: 'pointer', marginLeft: '10px', color: '#007bff' }}
+                                                onClick={() => handleThumbsUp(index, history[history.length - 2], message.text)}
+                                            />
+                                        )}
                                     </>
                                 )}
                             </div>
