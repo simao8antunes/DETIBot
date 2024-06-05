@@ -1,7 +1,5 @@
 #This class contains all the functions and calls to the other classes
-#To execute the neccessary methods to load the source provided in the
-#'loader' method.
-#from llama_index.core import SimpleDirectoryReader
+#To execute the neccessary methods to load the source.
 
 from Services.classes import URL_Source, File_Source
 from Services.indexing import Indexing
@@ -16,6 +14,7 @@ db = MySql()
 indexer = Indexing()
 class Loading:
 
+    # Manages the Loading Url Sources
     def url_loader(self, source: URL_Source):
         documents,childs=self.load_urls(source)
         if source.recursive:
@@ -23,6 +22,7 @@ class Loading:
         indexer.index(documents)
         return {"response": "Successfull"}
     
+    # Manages the Loading File Sources
     def file_loader(self, source: File_Source):
         if source.loader_type == "application/pdf":
             documents = self.load_pdf(source)
@@ -39,6 +39,7 @@ class Loading:
         indexer.index(documents)
         return {"response": "Successfull"}
     
+#------------------------- functions that loads diferent file extensions ---------------------------------    
     def load_csv(self, source:File_Source):
         loader = CSVLoader(file_path=source.file_path)
         return loader.load()
@@ -49,7 +50,7 @@ class Loading:
         return loader.load()
     
     def load_json(self, source:File_Source):
-        loader = JSONLoader(file_path=source.file_path)##ver documentaçao para ver se é assim
+        loader = JSONLoader(file_path=source.file_path)
         return loader.load()
     
     def load_html(self, source:File_Source):
@@ -63,7 +64,8 @@ class Loading:
     def load_pdf(self, source:File_Source):
         loader = PyPDFLoader(file_path=source.file_path)
         return loader.load()
-    
+
+#------------------------- function that loads the Url ---------------------------------    
     def load_urls(self, source:URL_Source):
         loader = urlLoader(urls=[source.url], browser="chrome", headless=True)
         return loader.load(wait_time=source.wait_time, recursive=source.recursive, paths=source.paths)

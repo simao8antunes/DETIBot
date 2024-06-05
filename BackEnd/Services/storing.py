@@ -16,9 +16,11 @@ from langchain_community.docstore.base import Document
 QDRANT_URL = "http://qdrantdb:6333" #url="http://qdrantdb:6333" <- docker || local -> url="http://localhost:6333"
 MYSQL_HOST = "mysqldb" #"mysqldb" <-docker || local -> "localhost"
 
+#Defines class that provides methods to interact with Qdrant
 class QStore:  
 
     def __init__(self):
+       # Defines the embending model
        self.embeddings = HuggingFaceEmbeddings(
             model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
             model_kwargs={'device':'cpu'},
@@ -27,7 +29,7 @@ class QStore:
             }
         )
        
-
+    # Function that indexes Faq Sources into Qdrant
     def index_faq(self, source:Faq_Source,meta):
         chunks = [Document(page_content=f"Pergunta: {source.question}\nResposta: {source.answer}",metadata={"source": {meta}})]
         index = Qdrant.from_documents(
@@ -40,7 +42,7 @@ class QStore:
         return {"response": "Successfull"}
  
 
-    
+    # Function that indexes the chunks of loaded sources
     def index_documents(self, chunks):
         index = Qdrant.from_documents(
             chunks,
@@ -50,13 +52,14 @@ class QStore:
         )
         index.client.close()
 
-
+    # Method that return the object retriever and the client connection that is used in querying.py
     def object_retriever(self):
         client = QdrantClient(url=QDRANT_URL)
         self.vector_store = Qdrant(client=client,embeddings=self.embeddings,collection_name="db")
         retriever = self.vector_store.as_retriever()
         return retriever, client
     
+    #Method that deletes vectors according to their source
     def delete_vectors(self, payload_source):
         client = QdrantClient(url=QDRANT_URL)
         if client.collection_exists(collection_name="db"):
@@ -72,11 +75,12 @@ class QStore:
             client.delete(collection_name="db", points_selector=delete_filter)
         client.close()
 
+#Defines class that provides methods to interact with MySQL
 class MySql:
     
     def __init__(self):
         
-        # Connect to MySQL
+        # Connects to MySQL
         try:
             self.conn = mysql.connector.connect(
                 host=MYSQL_HOST,
@@ -94,8 +98,9 @@ class MySql:
         except mysql.connector.Error as e:
             print("Error connecting to MySQL:", e)
 
-    def insert_source(self,source):# inserts the source object 
-        #insert_sql = "INSERT INTO source (url_path,loader_type,descript,update_period_id) VALUES (%s,%s,%s,%s)"        
+    def insert_source(self,source):# inserts the source metadata accoring to it's type
+
+        #FILE_SOURCE      
         if isinstance(source, File_Source): 
             insert_sql = (
                 "INSERT INTO file_source "
@@ -103,6 +108,8 @@ class MySql:
                 "VALUES (%s, %s, %s, %s)"
             )
             params = (source.file_name,source.file_path, source.loader_type, source.description)
+        
+        #URL_SOURCE
         elif isinstance(source, URL_Source):
             Id = 0
             if source.update_period == "Daily":
@@ -120,6 +127,7 @@ class MySql:
             )
             params = (source.url, ','.join(source.paths), source.description, source.wait_time, source.recursive, source.update_period,Id)
 
+        #FAQ_SOURCE
         elif isinstance(source,Faq_Source):
             faq_id = self.get("SELECT id FROM faq_source WHERE question = %s AND answer = %s",[source.question,source.answer])
             if faq_id == []:
@@ -139,6 +147,7 @@ class MySql:
             self.conn.commit()
         except mysql.connector.Error as e:
             error_message = str(e)
+            #Here it verifies if the inserted source was already in the  database
             if "Duplicate entry" in error_message:
                 return {"response": "This value already exists"}
             else:
@@ -146,6 +155,7 @@ class MySql:
                 return {"response": "Error inserting to MySQL: " + str(e)}
         return {"response": True}
 
+    #Saves the child urls and associate them with the parent Url
     def insert_child(self,childs:set,parent_link):
         parent_id = self.get("SELECT id FROM url_source WHERE url_link = %s",[parent_link])
         print(parent_id)
@@ -167,8 +177,8 @@ class MySql:
         return {"response": True}
 
 
-
-    def update_time(self,idx):# updates the period time in the update time table 
+    # updates the period time in the update time table
+    def update_time(self,idx): 
         update_sql = """
         UPDATE update_time SET update_period = %s WHERE id = %s
         """
@@ -188,8 +198,9 @@ class MySql:
         else:
             return "invalid index"
     
-    def get(self,query,arg):# implements the query, NOTA: maybe it is required more methods of this kind
-        self.cursor.execute(query,arg)# maybe put here a logger and a try/ctach
+    # funtion that does any type of query
+    def get(self,query,arg):
+        self.cursor.execute(query,arg)
         return self.cursor.fetchall()
     
 # URL_SOURCE
@@ -297,6 +308,7 @@ class MySql:
                 return {"response": "Error inserting to MySQL: " + str(e)}
         return {"response": True}
 
+
 # FILE_SOURCE        
     def list_file_sources(self):
         q = "SELECT * FROM file_source"
@@ -372,6 +384,7 @@ class MySql:
                 print("Error inserting to MySQL:", e)
                 return {"response": "Error inserting to MySQL: " + str(e)}
         return {"response": True}
+
 
 # FAQ_SOURCE 
     def list_faq_sources(self):

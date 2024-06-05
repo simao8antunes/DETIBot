@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
 
+#Modified SeleniumURLLoader class to support waiting time and recursive loads
 class SeleniumURLLoaderWithWait(SeleniumURLLoader):
     def load(self, wait_time: int = 3, recursive: bool = False, paths: List = []) -> Tuple[List[Document], List[str]]:
         from unstructured.partition.html import partition_html
@@ -17,6 +18,7 @@ class SeleniumURLLoaderWithWait(SeleniumURLLoader):
         driver = self._get_driver()
         child_links = set()
         visited_urls = []
+
 
         def scrape_recursive(url):
             nonlocal driver
@@ -28,6 +30,7 @@ class SeleniumURLLoaderWithWait(SeleniumURLLoader):
                 page_content = driver.page_source
                 soup = BeautifulSoup(page_content, 'html.parser')
 
+                #cleans the irrelevant data
                 lixos = soup.find_all(['nav', 'footer']) 
                 for l in lixos:
                     l.decompose()
@@ -51,6 +54,7 @@ class SeleniumURLLoaderWithWait(SeleniumURLLoader):
                     plan = f"/pt/c/{course_id}/p"
                     links.append(f"{base_url.scheme}://{base_url.netloc}{plan}")
 
+                # Get childs
                 for link in links:
                     if link:
                         absolute_link = urljoin(base_url.geturl(), link)
@@ -84,7 +88,7 @@ class SeleniumURLLoaderWithWait(SeleniumURLLoader):
     def _get_driver(self):
         from selenium import webdriver
         from selenium.webdriver.chrome.options import Options
-
+        # Setting driver to run on docker
         options = Options()
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')

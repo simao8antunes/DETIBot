@@ -1,6 +1,7 @@
-#This class contains all the functions and calls to the other classes
-#To execute the neccessary methods to index the loaded sources  
-#Into the vector store trough the 'indexer' method.
+#This class contains the function and calls class Qstore
+#To the split in chunks the loaded data and index it   
+#Into the vector store.
+
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from Services.storing import QStore
 
