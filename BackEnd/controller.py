@@ -3,7 +3,6 @@ from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import shutil
-from pydantic import BaseModel
 
 from Services import Query,Loading,MySql,URL_Source,File_Source,QStore,Faq_Source,Question
 
@@ -32,7 +31,7 @@ async def root():
 #---------------------- endpoints that returns an answer given a prompt--------------------------- 
 @app.post("/detibot/en")
 async def QuestionEn(payload: Question):
-    response = procurador.queries(payload.prompt, "pt", payload.chat)
+    response = procurador.queries(payload.prompt, "en", payload.chat)
     return response["query"]
 
 @app.post("/detibot/pt")
@@ -65,8 +64,8 @@ async def searchFileSources(search:str):
 @app.get("/detibot/Search_faq_sources/{search}")
 async def searchFaqSources(search:str):
     return db.search_faq_sources(search)
-#------------------------ endpoints that post the diferent type of sources in the system-----------------
 
+#------------------------ endpoints that post the diferent type of sources in the system-----------------
 @app.post("/detibot/insert_filesource")
 async def SourceFile(file: UploadFile = File(...), descript: str = Form(...)):
     if not file:

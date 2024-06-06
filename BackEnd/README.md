@@ -1,3 +1,15 @@
+Deti - BackEnd
+
+o backend esta organizado da seguinte forma: 
+
+    MySql - onde é guardado as tables que irao guardar informa;cao dos diferentes tipos de sources
+
+    controller.py -   API FastAPI que fornece todos os endpoints usados no projeto
+
+    update.py - atualiza informa;cao dos url baseado no seu update_time
+    
+    Services - restante codigo responsavel pelo loading, indexaçao, storing e querying
+
 para colocar o backend a funcionar é necessário:
 
 1- docker-compose up qdrant mysql ollama

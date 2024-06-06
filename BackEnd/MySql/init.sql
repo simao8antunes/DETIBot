@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS update_time (
     update_period VARCHAR(30)
 );
 
--- Creates source table
+-- Creates table that saves url metadata
 CREATE TABLE IF NOT EXISTS url_source (
     id INT AUTO_INCREMENT PRIMARY KEY,
     url_link VARCHAR(255) UNIQUE,
@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS url_source (
     FOREIGN KEY (update_period_id) REFERENCES update_time (id)
 );
 
+-- Creates table that saves child urls
 CREATE TABLE IF NOT EXISTS url_child_source (
     id INT AUTO_INCREMENT PRIMARY KEY,
     url_link VARCHAR(255),
@@ -27,7 +28,7 @@ CREATE TABLE IF NOT EXISTS url_child_source (
     FOREIGN KEY (parent_id) REFERENCES url_source (id) ON DELETE CASCADE
 );
 
--- Creates source table
+-- Creates table that saves metadata of files
 CREATE TABLE IF NOT EXISTS file_source (
     id INT AUTO_INCREMENT PRIMARY KEY,
     file_name VARCHAR(255) UNIQUE,
@@ -36,9 +37,10 @@ CREATE TABLE IF NOT EXISTS file_source (
     descript VARCHAR(255)
 );
 
+-- Creates table that saves metadata of faqs
 CREATE TABLE IF NOT EXISTS faq_source (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    question VARCHAR(255),
+    question VARCHAR(255) UNIQUE,
     answer VARCHAR(255) 
 );
 

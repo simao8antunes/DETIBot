@@ -16,8 +16,11 @@ qstore = QStore()
 class Query: 
 
     def __init__(self):
+        
+        #Defines connection with the ollama server and what LLM it uses
         self.llm = Ollama(model="llama3", temperature=0,base_url="http://ollama:11434") # ,base_url="http://ollama:11434" <- docker || local -> sem o ,base_url="http://ollama:11434"
         
+    # Formats list of messages in the chat into the format "message_id: {count}, message: {message}\n ..." for the LLM to be able to take into account the chat history
     def format_history(self, chat_history):
         history = ""
         count = 0
@@ -26,9 +29,15 @@ class Query:
             count += 1
         return history
 
+    #Function that processes the question and returns the answer
     def queries(self, question, language,chat):
+        #gets retriever object and client connection with Qdrant
         retriever, client = qstore.object_retriever()
+        
         history = self.format_history(chat)
+        
+        #Defines 2 diferent prompt templates to answer only in english or portuguese, 
+        # as well as a set o rules and instructions for how to answer and what to take into account when the LLM generates the answer.
         if language == "en":
             template = """
                 ### System:
@@ -66,6 +75,8 @@ class Query:
 
         # Creating the prompt from the template which we created before
         prompt = PromptTemplate.from_template(template)
+        
+        #Creats the chain that will in turn return an answer.
         qa_chain = create_stuff_documents_chain(self.llm, prompt)
         chain = create_retrieval_chain(retriever, qa_chain)
         input_data = {
@@ -73,8 +84,8 @@ class Query:
             'history': history,  # add history to input data
             'context': ""
         }
+        
         text = chain.invoke(input_data)
-        print(text)
         client.close()
         response = textwrap.fill(text['answer'])
         return {"query": response}

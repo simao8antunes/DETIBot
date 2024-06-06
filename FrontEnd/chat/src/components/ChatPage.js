@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { DropdownButton, Dropdown, Spinner } from 'react-bootstrap';
-import { FaThumbsUp, FaRegThumbsUp } from 'react-icons/fa'; // Import the filled and regular thumbs up icons
+import { FaThumbsUp, FaRegThumbsUp, FaVolumeUp } from 'react-icons/fa'; // Import the filled and regular thumbs up icons and volume icon
 import '../ChatPage.css';
 import userAvatar from '../assets/pfp.jpg'; // Placeholder user avatar
 import botAvatar from '../assets/detibot.png'; // Bot avatar
@@ -15,6 +15,14 @@ const ChatPage = () => {
     const [loading, setLoading] = useState(false); // State for loading indicator
     const [history, setHistory] = useState([]); // State for storing the conversation history
     const [thumbsUp, setThumbsUp] = useState({}); // State for tracking thumbs up status
+    const [listening, setListening] = useState(false); // State for the microphone status
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = language === 'en' ? 'en-US' : 'pt-PT';
 
     // Function to handle sending a new message
     const handleSendMessage = async () => {
@@ -86,11 +94,17 @@ const ChatPage = () => {
                 chatPageTitle: 'DetiBot',
                 sendButton: 'Send',
                 placeholder: 'Type your message...',
+                audioButton: 'Speak',
+                stopAudioButton: 'Stop',
+                playAudio: 'Play'
             },
             pt: {
                 chatPageTitle: 'DetiBot',
                 sendButton: 'Enviar',
                 placeholder: 'Escreva a sua mensagem...',
+                audioButton: 'Falar',
+                stopAudioButton: 'Parar',
+                playAudio: 'Ouvir'
             },
         };
 
@@ -116,6 +130,37 @@ const ChatPage = () => {
         } catch (error) {
             console.error('Error sending thumbs up data to API:', error);
         }
+    };
+
+    // Function to start/stop the voice recognition
+    const toggleListening = () => {
+        if (listening) {
+            recognition.stop();
+            setListening(false);
+        } else {
+            recognition.start();
+            setListening(true);
+        }
+    };
+
+    // Handle result of the speech recognition
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setNewMessage(transcript);
+        setListening(false);
+    };
+
+    // Handle speech recognition errors
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error', event);
+        setListening(false);
+    };
+
+    // Function to play audio of the given text
+    const playAudio = (text) => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = language === 'en' ? 'en-US' : 'pt-PT';
+        window.speechSynthesis.speak(utterance);
     };
 
     return (
@@ -151,6 +196,10 @@ const ChatPage = () => {
                                             className="avatar"
                                             style={{ width: '40px', height: '40px', borderRadius: '50%', marginLeft: '10px' }}
                                         />
+                                        <FaVolumeUp
+                                            style={{ cursor: 'pointer', marginLeft: '10px', color: '#007bff' }}
+                                            onClick={() => playAudio(message.text)}
+                                        />
                                     </div>
                                 ) : (
                                     <>
@@ -161,6 +210,10 @@ const ChatPage = () => {
                                             style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }}
                                         />
                                         <div className="message-bubble api-bubble">{message.text}</div>
+                                        <FaVolumeUp
+                                            style={{ cursor: 'pointer', marginLeft: '10px', color: '#007bff' }}
+                                            onClick={() => playAudio(message.text)}
+                                        />
                                         {thumbsUp[index] ? (
                                             <FaThumbsUp
                                                 style={{ cursor: 'pointer', marginLeft: '10px', color: '#007bff' }}
@@ -207,6 +260,18 @@ const ChatPage = () => {
                                 {translateText('sendButton')}
                             </button>
                         </div>
+                    </div>
+
+                    {/* Voice input button */}
+                    <div className="input-group mt-3">
+                        <button
+                            onClick={toggleListening}
+                            className={`btn btn-${listening ? 'danger' : 'secondary'}`}
+                            type="button"
+                            style={{ borderColor: '#007bff', borderRadius: '25px' }}
+                        >
+                            {listening ? translateText('stopAudioButton') : translateText('audioButton')}
+                        </button>
                     </div>
                 </div>
             </div>
