@@ -16,17 +16,21 @@
 ### Executar a Aplicação Completa
 
 ```sh
-docker-compose up --build
+docker-compose up mysql qdrant ollama
+docker exec -it ollama ollama run llama3
+docker-compose up update api chat admin manager
 ```
 
 ### Executar Backend
 
 ```sh
-docker-compose up --build
+docker-compose up mysql qdrant ollama
+docker exec -it ollama ollama run llama3
 docker-compose up update api
 ```
 ou se preferires correr localmente
 ```sh
-docker-compose up --build
+docker-compose up mysql qdrant ollama
+docker exec -it ollama ollama run llama3
 uvicorn controller:app --reload
 ```

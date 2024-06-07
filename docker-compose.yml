@@ -71,8 +71,8 @@ services:
       volumes:
         - .:/app
       stdin_open: true
-      #depends_on:
-      #  - api
+      depends_on:
+        - api
 
     admin:
       build: ./FrontEnd/adminUI
@@ -83,8 +83,8 @@ services:
       volumes:
         - .:/app
       stdin_open: true
-      #depends_on:
-      #  - api
+      depends_on:
+        - api
 
     manager:
       build: ./FrontEnd/manager
@@ -95,8 +95,8 @@ services:
       volumes:
         - .:/app
       stdin_open: true
-      #depends_on:
-      #  - api
+      depends_on:
+        - api
 
 volumes:
   ollama_data:

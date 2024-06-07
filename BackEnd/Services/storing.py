@@ -1,7 +1,6 @@
 #This file contains all the functions and calls to the other classes
 #To execute the neccessary methods to store data.  
-#In this file we have 2 classes: "Qdrant" and "H2".
-#This classes provide the necessary methods to Insert, Delete or modify data in Qdrant and H2.
+#In this file we have 2 classes: "Qstore" and "MySql".
 
 from Services import File_Source, URL_Source, Faq_Source
 from qdrant_client import QdrantClient
