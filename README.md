@@ -1,4 +1,4 @@
-# DETIBot - a chat bot for the Department of Electronics and Informatics of the University of Aveiro
+# DETIBot - a chatbot for the Department of Electronics and Informatics of the University of Aveiro
 
 [Website](https://detibot.pages.dev)
 
